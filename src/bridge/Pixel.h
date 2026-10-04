@@ -12,5 +12,7 @@
 
 uint32_t opaque_alpha(void);
 uint32_t transparent_alpha(void);
+uint32_t invert_channel(uint32_t channel);
+uint32_t double_channel_unclamped(uint32_t channel);
 
 #endif
