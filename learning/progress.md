@@ -4,9 +4,9 @@ This file records evidence; it does not replace reading the actual implementatio
 
 ## Current position
 
-- Next lesson: **M01-L02**
-- Current implementation revision: 35456db2377fa2afe814cfae2310a9e5972cf8bb
-- Last reviewed implementation revision: 35456db2377fa2afe814cfae2310a9e5972cf8bb
+- Next lesson: **M01-L03**
+- Current implementation revision: c1dd575eb643899fbfc867363d3eb9aea022f160
+- Last reviewed implementation revision: c1dd575eb643899fbfc867363d3eb9aea022f160
 - Toolchain/SDK record: learner confirmed the native arm64 environment and toolchain checks on 2026-10-04; exact compiler/SDK version output was not supplied.
 - Required fixes still open: none
 
@@ -21,7 +21,7 @@ Record the exact implementation commit being reviewed. Commit this progress upda
 | Lesson | Status | Reviewed implementation commit | Evidence / answers | Remaining work |
 | --- | --- | --- | --- | --- |
 | M01-L01 | Ready | 35456db2377fa2afe814cfae2310a9e5972cf8bb | Full source/diff reviewed; learner confirmed expected output, clean build, and environment; answers reviewed with corrections explained. | None. |
-| M01-L02 | Not started | — | — | — |
+| M01-L02 | Ready | c1dd575eb643899fbfc867363d3eb9aea022f160 | Full source/diff reviewed; learner confirmed program execution and all checks; answers assessed with ABI and unsigned-wrap clarifications. Completion accepted at learner's explicit request; documentation/trace exceptions recorded below. | None required for progression. |
 | M01-L03 | Not started | — | — | — |
 | M01-L04 | Not started | — | — | — |
 | M01-L05 | Not started | — | — | — |
@@ -104,6 +104,21 @@ Next action:
 - Static-only / unverified items: runtime confirmation is learner-reported; exact command logs and compiler/SDK versions were not supplied and were not independently verified.
 - Understanding questions: answers 1–3 correct; linker and directive/declaration distinctions in answers 4–5 corrected in conversation. Learner explicitly requested no restatement; no further answer submission required.
 - Next action: begin M01-L02.
+
+## M01-L02 review — 2026-10-04
+
+- Implementation commit: c1dd575eb643899fbfc867363d3eb9aea022f160
+- Previous reviewed implementation commit: 35456db2377fa2afe814cfae2310a9e5972cf8bb.
+- Files inspected: src/asm/pixel.s, src/bridge/Pixel.h, src/swift/main.swift; complete changes since the previous reviewed implementation and repository tree.
+- Reviewer environment: remote GitHub source inspection; no native macOS build or execution by reviewer.
+- Initial outcome: Verification pending; arithmetic and declarations correct, runtime evidence and separate contract documentation/register trace outstanding.
+- Final outcome: Ready at the learner's explicit request to record the lesson as done after confirming program execution and all checks.
+- Required fixes: no arithmetic or ABI defects found. Separate contract comments and a learner-written register trace were not supplied; accepted as documentation/trace exceptions for progression at the learner's completion request, not represented as fulfilled requirements.
+- Evidence executed by reviewer: none; static review only.
+- Evidence supplied by learner: confirmed running the program and that everything checks, covering lesson examples and checks in the review context.
+- Static-only / unverified items: runtime results are learner-confirmed; exact build/run commands and output logs were not supplied or independently verified. Header contract comments remain absent in the reviewed revision. No separate learner-written register trace was submitted; static trace for input 40 is entry w0=40, after mov w1=255, after sub w0=215.
+- Understanding questions: all four answers assessed. Clarified that the calling convention assigns both argument and result to w0; swapping subtraction operands gives channel minus 255, whose negative mathematical result wraps when returned as UInt32 (40 produces 4,294,967,081). UInt8 range and the caller's input-range responsibility were understood. No further answer submission required.
+- Next action: begin M01-L03.
 
 ## How to resume
 
