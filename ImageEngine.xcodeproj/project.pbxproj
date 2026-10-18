@@ -21,9 +21,22 @@
 		71DDD2D930856EE9001B3762 /* ImageEngine */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ImageEngine; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		71DDD2E730856FD0001B3762 /* Exceptions for "ImageEngine" folder in "Compile Sources" phase from "ImageEngine" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 71DDD2D530856EE9001B3762 /* Sources */;
+			membershipExceptions = (
+				Pixel.h,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		71DDD2DB30856EE9001B3762 /* ImageEngine */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				71DDD2E730856FD0001B3762 /* Exceptions for "ImageEngine" folder in "Compile Sources" phase from "ImageEngine" target */,
+			);
 			path = ImageEngine;
 			sourceTree = "<group>";
 		};
@@ -242,6 +255,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/ImageEngine/Pixel.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -253,6 +267,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/ImageEngine/Pixel.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
