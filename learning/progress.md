@@ -4,11 +4,13 @@ This file records evidence; it does not replace reading the actual implementatio
 
 ## Current position
 
-- Next lesson: **M01-L03**
-- Current implementation revision: 033a92f2ef8bc5edfbee645bc4b381940e3f3aaf
-- Last reviewed implementation revision: 033a92f2ef8bc5edfbee645bc4b381940e3f3aaf
-- Toolchain/SDK record: learner confirmed the native arm64 environment and toolchain checks on 2026-10-04; exact compiler/SDK version output was not supplied.
-- Required fixes still open: fix array formatting in src/swift/main.swift:26 so the pushed revision builds; document the packing input range and packed layout beside the declarations in src/bridge/Pixel.h; rebuild, run, and submit the corrected revision.
+- Next lesson: **M01-L04**
+- Current implementation revision: 50280e44dd0b71b73cb598c869c2b5b513c6ae70
+- Last reviewed implementation revision: c97016d38061bc482a4e3931e4f5bf082700f2a1
+- Toolchain/SDK record: reviewer verified native arm64 execution with Xcode 27.1 (build 27A9275) and the macOS 27.0 SDK on 2026-10-25. The complete compiler version output was not separately captured during this follow-up.
+- Required fixes still open: none for M01-L03.
+- Current source layout: `ImageEngine/Pixel.s`, `ImageEngine/Pixel.h`, and `ImageEngine/main.swift`, built through `ImageEngine.xcodeproj`. Earlier review entries retain their historical `src/` paths.
+- Revision note: 50280e44dd0b71b73cb598c869c2b5b513c6ae70 adds ignore rules and a shared scheme after the reviewed revision; its diff contains no changes to the three implementation files or `project.pbxproj`. Native build/run evidence below applies to c97016d38061bc482a4e3931e4f5bf082700f2a1.
 
 ## Status definitions
 
@@ -22,7 +24,7 @@ Record the exact implementation commit being reviewed. Commit this progress upda
 | --- | --- | --- | --- | --- |
 | M01-L01 | Ready | 35456db2377fa2afe814cfae2310a9e5972cf8bb | Full source/diff reviewed; learner confirmed expected output, clean build, and environment; answers reviewed with corrections explained. | None. |
 | M01-L02 | Ready | c1dd575eb643899fbfc867363d3eb9aea022f160 | Full source/diff reviewed; learner confirmed program execution and all checks; answers assessed with ABI and unsigned-wrap clarifications. Completion accepted at learner's explicit request; documentation/trace exceptions recorded below. | None required for progression. |
-| M01-L03 | Changes requested | 033a92f2ef8bc5edfbee645bc4b381940e3f3aaf | Full source/diff inspected; native arm64 assembly compilation passed; Swift type-check failed on array formatting. Learner reported successful execution and submitted all four answers; corrections explained. | Fix the Swift diagnostic and header contracts, then rebuild/run and review the new hash. |
+| M01-L03 | Ready | c97016d38061bc482a4e3931e4f5bf082700f2a1 | Corrected Swift diagnostic and header contracts inspected; native arm64 Xcode Debug build and all existing checks passed. Prior question assessment retained, with corrections already explained. | None. Next: M01-L04. |
 | M01-L04 | Not started | — | — | — |
 | M01-L05 | Not started | — | — | — |
 | M02-L01 | Not started | — | — | — |
@@ -150,6 +152,39 @@ Next action:
 ### Optional improvements
 
 - Add a space between the expected and actual values in the packing failure message so the diagnostic is easier to read.
+
+## M01-L03 follow-up review — 2026-10-25
+
+- Implementation commit: c97016d38061bc482a4e3931e4f5bf082700f2a1.
+- Previous reviewed implementation commit: 033a92f2ef8bc5edfbee645bc4b381940e3f3aaf, as recorded in the 2026-10-18 review.
+- Files inspected: `ImageEngine/Pixel.s`, `ImageEngine/Pixel.h`, `ImageEngine/main.swift`, `ImageEngine.xcodeproj/project.pbxproj`, repository tree, course guide, M01 lesson text, tutor guidance, assembly/ABI reference, and this progress record.
+- Reviewer environment: native arm64 macOS; Xcode 27.1 (build 27A9275), macOS 27.0 SDK. Exact implementation and project files were copied to a temporary review directory; repository source was not changed.
+- Outcome: **Ready**. Both required fixes from the prior review are present, the Xcode Debug build succeeds, and the executable passes the lesson checks and earlier examples.
+- Required fixes: none. `checkPixel` now formats arrays directly in its failure message. The header documents packing inputs in 0...255, integer layout 0xAABBGGRR, and extraction results in 0...255.
+- Evidence executed by reviewer: the Xcode target was built with the command below and the resulting executable was run; both exited successfully. The initial sandboxed build could not write Xcode caches; the same command succeeded after normal cache access was authorized.
+- Evidence supplied by learner: prior question answers and their assessment are preserved in the 2026-10-18 entry. The learner also reported completing ignore rules and a shared scheme; the later commit's diff confirms those additions.
+- Static-only / unverified items: the historical implementation hash returned HTTP 404 in the current repository, so a fresh diff against that old revision was unavailable. The follow-up used the complete current files and the preserved prior review findings. Release-mode execution and performance were not tested or required for this lesson.
+- Understanding questions: all four were previously assessed; the mask-width, OR, and invalid-input corrections were already explained. The prior review explicitly requested no additional answer submission. No new questions are outstanding.
+- Next action: begin **M01-L04 — Register width and integer interpretation** using the current Xcode layout.
+
+| Completion requirement | Evidence | Status |
+| --- | --- | --- |
+| Packing and four extraction functions | Complete assembly inspected; shifts, OR, masks, return register, and scratch-register use match the contract. Assembly compiled and linked through Xcode. | Met |
+| Matching C declarations | Five declarations match the exported symbols and use uint32_t. Swift calls link and execute. | Met |
+| Explicit channel domain and layout | Pixel.h documents 0...255 packing inputs, 0xAABBGGRR layout, and 0...255 extraction results. | Met |
+| Decimal and hexadecimal examples with labelled output | Both examples print 0x44332211; channels print 17, 34, 51, and 68. | Met |
+| Exact expected values and round trips, including zero and 255 | All five checkPixel cases completed, including opaque black, opaque white, and mixed endpoint values; runner printed RGBA packing/unpacking tests passed. | Met |
+| Earlier examples preserved | Runtime output confirmed alpha 255/0, inversion results 255/254/215/127/0, doubling 200 to 400, and passing double-inversion checks. | Met |
+| Bit-position explanation and final questions | Prior answer assessment and explained corrections retained from the 2026-10-18 review. | Met with corrections explained |
+
+The temporary review directory was `/private/tmp/imageengine-review-c97016d`. Exact successful build and run commands:
+
+```bash
+xcodebuild -project /private/tmp/imageengine-review-c97016d/ImageEngine.xcodeproj -target ImageEngine -configuration Debug ARCHS=arm64 ONLY_ACTIVE_ARCH=YES CODE_SIGNING_ALLOWED=NO SYMROOT=/private/tmp/imageengine-review-c97016d/build OBJROOT=/private/tmp/imageengine-review-c97016d/obj CLANG_MODULE_CACHE_PATH=/private/tmp/imageengine-review-c97016d/ModuleCache build
+/private/tmp/imageengine-review-c97016d/build/Debug/ImageEngine
+```
+
+The later workflow commit `50280e44dd0b71b73cb598c869c2b5b513c6ae70` changes only `.gitignore` and adds `ImageEngine.xcodeproj/xcshareddata/xcschemes/ImageEngine.xcscheme`. It was inspected separately; the shared scheme was not used for the earlier target-based build. This progress update is committed afterward so its own commit hash is not used as the reviewed implementation hash.
 
 ## How to resume
 
