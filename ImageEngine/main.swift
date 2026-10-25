@@ -76,3 +76,25 @@ checkPixel(r: 255, g: 255, b: 255, a: 255, expected: 0xFFFFFFFF)
 checkPixel(r: 255, g: 0, b: 255, a: 0, expected: 0x00FF00FF)
 
 print("RGBA packing/unpacking tests passed")
+
+let maximum: UInt32 = UInt32.max
+
+let addedBeforeWidening: UInt64 = add_one_u32_then_widen(maximum)
+
+let addedAfterWidening: UInt64 = widen_then_add_one(maximum)
+
+print("Add in 32 bits, then widen: \(addedBeforeWidening)")
+print("Widen, then add in 64 bits: \(addedAfterWidening)")
+
+let widths: [UInt32] = [0, 1, 3, UInt32.max]
+
+for width in widths {
+    let bytes: UInt64 = rgba_row_bytes(width)
+    print("width \(width): \(bytes) bytes")
+}
+
+let largestRowBytes: UInt64 = rgba_row_bytes(UInt32.max)
+
+guard largestRowBytes == 17_179_869_180 else {
+    fatalError("Wrong row size: got \(largestRowBytes)")
+}

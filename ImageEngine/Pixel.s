@@ -58,3 +58,23 @@ _alpha_channel:
     lsr w0, w0, #24
     and w0, w0, #255
     ret
+
+.p2align 2
+.globl _add_one_u32_then_widen
+_add_one_u32_then_widen:
+    add w0, w0, #1
+    ret
+
+.p2align 2
+.globl _widen_then_add_one
+_widen_then_add_one:
+    mov w0, w0
+    add x0, x0, #1
+    ret
+
+.p2align 2
+.globl _rgba_row_bytes
+_rgba_row_bytes:
+    mov w0, w0
+    lsl x0, x0, #2
+    ret

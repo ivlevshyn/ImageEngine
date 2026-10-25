@@ -19,4 +19,11 @@ uint32_t green_channel(uint32_t pixel);
 uint32_t blue_channel(uint32_t pixel);
 uint32_t alpha_channel(uint32_t pixel);
 
+uint64_t add_one_u32_then_widen(uint32_t value);
+uint64_t widen_then_add_one(uint32_t value);
+
+// Returns width * 4 using 64 bits
+// Calculates a byte count only; does not allocate or access memory
+uint64_t rgba_row_bytes(uint32_t width);
+
 #endif
