@@ -4,13 +4,13 @@ This file records evidence; it does not replace reading the actual implementatio
 
 ## Current position
 
-- Next lesson: **M01-L04**
-- Current implementation revision: 50280e44dd0b71b73cb598c869c2b5b513c6ae70
-- Last reviewed implementation revision: c97016d38061bc482a4e3931e4f5bf082700f2a1
-- Toolchain/SDK record: reviewer verified native arm64 execution with Xcode 27.1 (build 27A9275) and the macOS 27.0 SDK on 2026-10-25. The complete compiler version output was not separately captured during this follow-up.
-- Required fixes still open: none for M01-L03.
+- Next lesson: **M01-L05**
+- Current implementation revision: fc725ed9bef85083346290ecebe5877ca89544a2
+- Last reviewed implementation revision: fc725ed9bef85083346290ecebe5877ca89544a2
+- Toolchain/SDK record: reviewer verified native arm64 execution on macOS 27.0.1 (build 26A434), Apple Swift 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1), Apple Clang 21.0.0 (clang-2100.3.34.2), and the macOS 27.0 SDK on 2026-10-26. L04 was built with direct xcrun compiler commands in debug mode.
+- Required fixes still open: none for M01-L04.
 - Current source layout: `ImageEngine/Pixel.s`, `ImageEngine/Pixel.h`, and `ImageEngine/main.swift`, built through `ImageEngine.xcodeproj`. Earlier review entries retain their historical `src/` paths.
-- Revision note: 50280e44dd0b71b73cb598c869c2b5b513c6ae70 adds ignore rules and a shared scheme after the reviewed revision; its diff contains no changes to the three implementation files or `project.pbxproj`. Native build/run evidence below applies to c97016d38061bc482a4e3931e4f5bf082700f2a1.
+- Revision note: fc725ed9bef85083346290ecebe5877ca89544a2 is the reviewed main-branch merge commit containing the L04 implementation from 98841f8cb77ad886d572f0cd870c858b0ee2a21e and the preceding progress update. This documentation-only update is committed afterward; the recorded reviewed hash remains the implementation revision.
 
 ## Status definitions
 
@@ -25,7 +25,7 @@ Record the exact implementation commit being reviewed. Commit this progress upda
 | M01-L01 | Ready | 35456db2377fa2afe814cfae2310a9e5972cf8bb | Full source/diff reviewed; learner confirmed expected output, clean build, and environment; answers reviewed with corrections explained. | None. |
 | M01-L02 | Ready | c1dd575eb643899fbfc867363d3eb9aea022f160 | Full source/diff reviewed; learner confirmed program execution and all checks; answers assessed with ABI and unsigned-wrap clarifications. Completion accepted at learner's explicit request; documentation/trace exceptions recorded below. | None required for progression. |
 | M01-L03 | Ready | c97016d38061bc482a4e3931e4f5bf082700f2a1 | Corrected Swift diagnostic and header contracts inspected; native arm64 Xcode Debug build and all existing checks passed. Prior question assessment retained, with corrections already explained. | None. Next: M01-L04. |
-| M01-L04 | Not started | — | — | — |
+| M01-L04 | Ready | fc725ed9bef85083346290ecebe5877ca89544a2 | Complete implementation and diff reviewed; exact committed runner built and executed on native arm64 macOS; 10 supplementary lesson checks passed. All four answers assessed; corrections to Q3 and Q4 explained. | None. Next: M01-L05. |
 | M01-L05 | Not started | — | — | — |
 | M02-L01 | Not started | — | — | — |
 | M02-L02 | Not started | — | — | — |
@@ -185,6 +185,49 @@ xcodebuild -project /private/tmp/imageengine-review-c97016d/ImageEngine.xcodepro
 ```
 
 The later workflow commit `50280e44dd0b71b73cb598c869c2b5b513c6ae70` changes only `.gitignore` and adds `ImageEngine.xcodeproj/xcshareddata/xcschemes/ImageEngine.xcscheme`. It was inspected separately; the shared scheme was not used for the earlier target-based build. This progress update is committed afterward so its own commit hash is not used as the reviewed implementation hash.
+
+## M01-L04 review — 2026-10-26
+
+- Implementation commit: fc725ed9bef85083346290ecebe5877ca89544a2.
+- Previous reviewed implementation commit: c97016d38061bc482a4e3931e4f5bf082700f2a1.
+- Files inspected: `ImageEngine/Pixel.s`, `ImageEngine/Pixel.h`, `ImageEngine/main.swift`, `ImageEngine.xcodeproj/project.pbxproj`, `learning/progress.md`, course guide, selected lesson, tutor guidance, and assembly/ABI reference. The complete diff since the previous reviewed revision was inspected. Local HEAD matched the latest pushed main-branch commit and the working tree was clean.
+- Reviewer environment: native arm64 macOS 27.0.1 (build 26A434); Apple Swift 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1), target arm64-apple-macosx27.0.0; Apple Clang 21.0.0 (clang-2100.3.34.2); macOS 27.0 SDK. Compiler commands used Xcode's installed tools through `xcrun`.
+- Outcome: **Ready**. All three functions, interface types, lesson results, and earlier examples are correct. No required fixes remain.
+- Evidence executed by reviewer: extracted the exact committed source files into a temporary directory, assembled and linked them with `xcrun clang` and `xcrun swiftc -g -Onone`, and ran the unchanged committed Swift runner. Compilation and execution exited successfully, and all 23 output lines matched the expected results. A separate reviewer-created Swift runner linked against the same assembly object and passed all 10 lesson checks listed below. Repository source was not changed during review.
+- Evidence supplied by learner: reported completing the lesson and submitted all four understanding answers in the teaching conversation. Runtime evidence for this review was independently executed by the reviewer.
+- Static-only / unverified items: the Xcode target itself, release-mode behavior, and performance were not tested in this review. They are not required for L04. The supplementary runner is review evidence, not committed project test coverage.
+- Understanding questions: Q1 correct: writing W0 does not preserve X0's old upper half. Q2 correct: the self-move establishes zero upper bits. Q3 incorrect initially: a W-register shift is limited to 32 bits, not 64; explained truncation with UInt32.max times four yielding 4,294,967,292 in W0 instead of 17,179,869,180 in X0. Q4 incomplete initially: a valid UInt32 width does not establish valid allocated storage; explained valid starting address, sufficient storage, bounded accesses, and overflow-free size arithmetic. Corrections were explained before the learner submitted the implementation for review; no repeat answer submission was required.
+- Required fixes: none.
+- Optional improvement: retain explicit checks for every lesson case in `main.swift`. The committed runner prints the maximum-input addition results and all four row-byte results, but only the largest row size has a new explicit failure check; the addition cases for 0 and 254 were verified by the supplementary runner.
+- Next action: begin **M01-L05 — Follow the machine in LLDB**.
+
+| Completion requirement | Evidence | Status |
+| --- | --- | --- |
+| Three complete assembly functions and ABI behavior | Correct W/X operations, explicit widening, exported symbols, and returns. Functions use only X0/W0, make no calls, and perform no memory access. | Met |
+| Explicit argument and result widths | Header declares uint32_t inputs and uint64_t results; the Swift runner receives UInt64 results. Compilation, linking, and execution succeed. | Met |
+| Add before/after widening | Supplementary checks confirm both functions return 1 for 0 and 255 for 254; UInt32.max produces 0 and 4,294,967,296 respectively. | Met |
+| Wide row-byte arithmetic and result table | Header documents 64-bit byte-count calculation; assembly widens before the X-register shift. Runner prints all four required widths with correct results, independently checked below. | Met |
+| No giant allocation; arithmetic versus memory validity | Functions calculate integers only. Header states no allocation/access; valid storage and bounded access requirements were explained in the answer assessment. | Met with corrections explained |
+| Earlier examples preserved | Unchanged runner passed packing/extraction and double-inversion checks; output confirmed alpha 255/0, inversion 255/254/215/127/0, and doubling 200 to 400. | Met |
+| Final understanding questions | All four assessed in conversation; Q1-Q2 correct, Q3-Q4 corrections explained, no further submission requested. | Met with corrections explained |
+
+The 10 independently checked results were:
+
+| Function | Inputs | Expected and observed results |
+| --- | --- | --- |
+| `add_one_u32_then_widen` | 0, 254, UInt32.max | 1, 255, 0 |
+| `widen_then_add_one` | 0, 254, UInt32.max | 1, 255, 4,294,967,296 |
+| `rgba_row_bytes` | 0, 1, 3, UInt32.max | 0, 4, 12, 17,179,869,180 |
+
+Exact source snapshots, supplementary runner, and command/output log were kept at `/private/tmp/imageengine-review-fc725ed-p720oppa/` during review (`review.log`). The committed implementation was built and run with:
+
+```bash
+xcrun clang -arch arm64 -g -c /private/tmp/imageengine-review-fc725ed-p720oppa/Pixel.s -o /private/tmp/imageengine-review-fc725ed-p720oppa/pixel.o
+xcrun swiftc -g -Onone -module-cache-path /private/tmp/imageengine-review-fc725ed-p720oppa/ModuleCache -import-objc-header /private/tmp/imageengine-review-fc725ed-p720oppa/Pixel.h /private/tmp/imageengine-review-fc725ed-p720oppa/main.swift /private/tmp/imageengine-review-fc725ed-p720oppa/pixel.o -o /private/tmp/imageengine-review-fc725ed-p720oppa/ImageEngine
+/private/tmp/imageengine-review-fc725ed-p720oppa/ImageEngine
+```
+
+The separate `LessonChecks.swift` was compiled with the same header, assembly object, and compiler options and run successfully. This progress update is committed after the reviewed implementation so its own hash is not used as review evidence.
 
 ## How to resume
 
