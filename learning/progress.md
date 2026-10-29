@@ -4,13 +4,13 @@ This file records evidence; it does not replace reading the actual implementatio
 
 ## Current position
 
-- Next lesson: **M01-L05**
-- Current implementation revision: fc725ed9bef85083346290ecebe5877ca89544a2
-- Last reviewed implementation revision: fc725ed9bef85083346290ecebe5877ca89544a2
+- Next lesson: **M02-L01**
+- Current implementation revision: 85a0040f242a01d79c9b1a3890da29da2c2586fe
+- Last reviewed implementation revision: 85a0040f242a01d79c9b1a3890da29da2c2586fe
 - Toolchain/SDK record: reviewer verified native arm64 execution on macOS 27.0.1 (build 26A434), Apple Swift 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1), Apple Clang 21.0.0 (clang-2100.3.34.2), and the macOS 27.0 SDK on 2026-10-26. L04 was built with direct xcrun compiler commands in debug mode.
-- Required fixes still open: none for M01-L04.
+- Required fixes still open: none for M01-L05. Completion uses learner-confirmed execution; the unsubmitted trace/note exception is recorded below.
 - Current source layout: `ImageEngine/Pixel.s`, `ImageEngine/Pixel.h`, and `ImageEngine/main.swift`, built through `ImageEngine.xcodeproj`. Earlier review entries retain their historical `src/` paths.
-- Revision note: fc725ed9bef85083346290ecebe5877ca89544a2 is the reviewed main-branch merge commit containing the L04 implementation from 98841f8cb77ad886d572f0cd870c858b0ee2a21e and the preceding progress update. This documentation-only update is committed afterward; the recorded reviewed hash remains the implementation revision.
+- Revision note: 85a0040f242a01d79c9b1a3890da29da2c2586fe is the exact main-branch source snapshot inspected for L05. Its only change from the previously reviewed implementation fc725ed9bef85083346290ecebe5877ca89544a2 is the L04 progress record; all implementation files are unchanged. This L05 progress update is committed afterward. The learner's local executable revision was not independently established.
 
 ## Status definitions
 
@@ -26,7 +26,7 @@ Record the exact implementation commit being reviewed. Commit this progress upda
 | M01-L02 | Ready | c1dd575eb643899fbfc867363d3eb9aea022f160 | Full source/diff reviewed; learner confirmed program execution and all checks; answers assessed with ABI and unsigned-wrap clarifications. Completion accepted at learner's explicit request; documentation/trace exceptions recorded below. | None required for progression. |
 | M01-L03 | Ready | c97016d38061bc482a4e3931e4f5bf082700f2a1 | Corrected Swift diagnostic and header contracts inspected; native arm64 Xcode Debug build and all existing checks passed. Prior question assessment retained, with corrections already explained. | None. Next: M01-L04. |
 | M01-L04 | Ready | fc725ed9bef85083346290ecebe5877ca89544a2 | Complete implementation and diff reviewed; exact committed runner built and executed on native arm64 macOS; 10 supplementary lesson checks passed. All four answers assessed; corrections to Q3 and Q4 explained. | None. Next: M01-L05. |
-| M01-L05 | Not started | — | — | — |
+| M01-L05 | Ready | 85a0040f242a01d79c9b1a3890da29da2c2586fe | Current source and intervening diff inspected; learner confirmed following the guided LLDB session and everything working as expected. All four answers assessed, with LR naming and final W/X result corrections explained. Unsubmitted trace/note exception recorded below. | None required for progression. Next: M02-L01. |
 | M02-L01 | Not started | — | — | — |
 | M02-L02 | Not started | — | — | — |
 | M02-L03 | Not started | — | — | — |
@@ -228,6 +228,34 @@ xcrun swiftc -g -Onone -module-cache-path /private/tmp/imageengine-review-fc725e
 ```
 
 The separate `LessonChecks.swift` was compiled with the same header, assembly object, and compiler options and run successfully. This progress update is committed after the reviewed implementation so its own hash is not used as review evidence.
+
+## M01-L05 review — 2026-10-29
+
+- Implementation/source snapshot inspected: 85a0040f242a01d79c9b1a3890da29da2c2586fe.
+- Previous reviewed implementation commit: fc725ed9bef85083346290ecebe5877ca89544a2.
+- Files inspected: `ImageEngine/Pixel.s`, `ImageEngine/Pixel.h`, `ImageEngine/main.swift`, `learning/progress.md`, tutor guidance, course guide, complete M01-L05 lesson, and debugging reference. The comparison against the previous reviewed revision contains only the L04 progress update; implementation source is unchanged.
+- Reviewer environment: remote GitHub source inspection. No new build, program execution, or LLDB session was performed by the reviewer for L05. The toolchain record above is historical L04 evidence; no fresh compiler/SDK output was supplied for this session.
+- Initial outcome: **Verification pending** after assessing the answers, while awaiting execution evidence.
+- Final outcome: **Ready**, accepting the learner's subsequent confirmation that they debugged as instructed and everything worked as expected, followed by their explicit request to commit and push the updated progress record.
+- Evidence supplied by learner: reported completing the guided debugger session successfully. In context, the session covered `invert_channel(40)`, stepping through its return, `widen_then_add_one(UInt32.max)`, inspecting results before `ret`, and finishing execution with existing examples.
+- Evidence executed by reviewer: none for L05; source inspection and GitHub revision comparison only. Earlier independent L04 runtime evidence remains recorded in its own review and is not represented as a new debugger run.
+- Static-only / unverified items: actual LLDB output, the concise saved trace, the learner note about disassembly/aliases, exact local build/run output, and local revision/working-tree state were not submitted or independently inspected. The learner report is accepted as runtime confirmation. The unsubmitted trace/note is an explicit documentation exception for progression at the learner's completion request, not a claim that those artifacts were reviewed or committed.
+- Understanding questions: Q1 correct in substance; clarified that stepping over runs through a call, whereas instruction stepping enters it. Q2 correct: an older executable can prevent resolving the expected function. Q3 correct return-address concept; corrected the register name from `lc` to `lr` (`x30`). Q4 correctly described clearing the upper 32 bits and `w0=0xffffffff` after the self-move; the missing post-add state was explained: `x0=0x0000000100000000`, `w0=0x00000000`. All four were assessed; corrections were explained, with no repeat answer submission required.
+- Required fixes: no code defects found in the lesson functions; no required fixes remain for progression.
+- Optional improvement: retain concise real LLDB traces and an alias note with future debugging evidence.
+- Next action: begin **M02-L01 — Read and write through a pointer**.
+
+| Completion requirement | Evidence | Status |
+| --- | --- | --- |
+| Predictable inversion input and separate width example | Committed driver first calls inversion with 40 and calls `widen_then_add_one` with `UInt32.max`; matching assembly and declarations inspected. | Met |
+| Usable debug build and source/executable correspondence | Learner confirmed following the guided build/debug session successfully; exact local source/executable correspondence was not independently established. | Met by learner confirmation; independent verification unavailable |
+| Observe inversion register states and result before return | Guided trace covered entry 40, scratch 255, result 215, and the return; learner confirmed debugging as instructed. Actual output was not supplied. | Met by learner confirmation |
+| Observe widening and full result before return | Guided trace covered explicit zero-extension followed by the 64-bit result 4,294,967,296; learner confirmed the session. Post-add W/X views were clarified in answer assessment. | Met by learner confirmation, with correction explained |
+| Concise trace and disassembly/alias note | No saved trace or learner note submitted for inspection; teaching examples are expected states, not captured runtime output. | Unverified; documentation exception accepted for progression |
+| Existing examples and any restored deliberate errors | Learner reported everything working as expected after the final instructions. Current committed arithmetic remains correct and unchanged; no deliberate-error experiment was reported. | Met by learner confirmation; no deliberate error reported |
+| Final understanding questions | All four assessed; step-over behavior, LR naming, and post-add W/X state clarified. | Met with corrections explained |
+
+This documentation-only progress commit follows the inspected source snapshot. It does not add implementation code or fabricate debugger transcripts.
 
 ## How to resume
 
