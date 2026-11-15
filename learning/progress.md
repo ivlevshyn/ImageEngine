@@ -4,13 +4,15 @@ This file records evidence; it does not replace reading the actual implementatio
 
 ## Current position
 
-- Next lesson: **M02-L01**
-- Current implementation revision: 85a0040f242a01d79c9b1a3890da29da2c2586fe
-- Last reviewed implementation revision: 85a0040f242a01d79c9b1a3890da29da2c2586fe
-- Toolchain/SDK record: reviewer verified native arm64 execution on macOS 27.0.1 (build 26A434), Apple Swift 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1), Apple Clang 21.0.0 (clang-2100.3.34.2), and the macOS 27.0 SDK on 2026-10-26. L04 was built with direct xcrun compiler commands in debug mode.
-- Required fixes still open: none for M01-L05. Completion uses learner-confirmed execution; the unsubmitted trace/note exception is recorded below.
-- Current source layout: `ImageEngine/Pixel.s`, `ImageEngine/Pixel.h`, and `ImageEngine/main.swift`, built through `ImageEngine.xcodeproj`. Earlier review entries retain their historical `src/` paths.
-- Revision note: 85a0040f242a01d79c9b1a3890da29da2c2586fe is the exact main-branch source snapshot inspected for L05. Its only change from the previously reviewed implementation fc725ed9bef85083346290ecebe5877ca89544a2 is the L04 progress record; all implementation files are unchanged. This L05 progress update is committed afterward. The learner's local executable revision was not independently established.
+- Current lesson: **M02-L01 — Read and write through a pointer**.
+- Next lesson: **M02-L01 final checks/review**; M02-L02 follows after completion.
+- Current implementation revision: f01291a9ce85281943b4204289dd34322fc956cb
+- Last reviewed implementation revision: f01291a9ce85281943b4204289dd34322fc956cb (changes requested; not yet Ready).
+- Last Ready implementation revision: 85a0040f242a01d79c9b1a3890da29da2c2586fe (M01-L05).
+- Toolchain/SDK record: reviewer verified native arm64 execution on macOS 27.2.1 (build 26B131), Apple Swift 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1), Apple Clang 21.0.0 (clang-2100.4.1.1), and the macOS 27.2 SDK on 2026-11-15. Developer directory: /Applications/Xcode.app/Contents/Developer. M02-L01 was built with direct xcrun compiler commands in debug mode.
+- Required fixes still open: document the four-writable-byte precondition beside invert_pixel in ImageEngine/Pixel.h. Completion evidence still pending: byte-oriented LLDB trace and all four end-of-lesson answers.
+- Current source layout: ImageEngine/Pixel.s, ImageEngine/Pixel.h, and ImageEngine/main.swift, built through ImageEngine.xcodeproj. Earlier review entries retain their historical src/ paths.
+- Revision note: f01291a9ce85281943b4204289dd34322fc956cb is the exact inspected and executed source snapshot. This progress-only commit follows it and does not change implementation source.
 
 ## Status definitions
 
@@ -27,7 +29,7 @@ Record the exact implementation commit being reviewed. Commit this progress upda
 | M01-L03 | Ready | c97016d38061bc482a4e3931e4f5bf082700f2a1 | Corrected Swift diagnostic and header contracts inspected; native arm64 Xcode Debug build and all existing checks passed. Prior question assessment retained, with corrections already explained. | None. Next: M01-L04. |
 | M01-L04 | Ready | fc725ed9bef85083346290ecebe5877ca89544a2 | Complete implementation and diff reviewed; exact committed runner built and executed on native arm64 macOS; 10 supplementary lesson checks passed. All four answers assessed; corrections to Q3 and Q4 explained. | None. Next: M01-L05. |
 | M01-L05 | Ready | 85a0040f242a01d79c9b1a3890da29da2c2586fe | Current source and intervening diff inspected; learner confirmed following the guided LLDB session and everything working as expected. All four answers assessed, with LR naming and final W/X result corrections explained. Unsubmitted trace/note exception recorded below. | None required for progression. Next: M02-L01. |
-| M02-L01 | Not started | — | — | — |
+| M02-L01 | Changes requested | f01291a9ce85281943b4204289dd34322fc956cb | Complete source and intervening diff reviewed; exact committed runner built and executed on native arm64 macOS; 3 supplementary lesson checks and 768 value/boundary checks passed. | Document invert_pixel's four-byte precondition; supply LLDB byte trace and final answers. |
 | M02-L02 | Not started | — | — | — |
 | M02-L03 | Not started | — | — | — |
 | M02-L04 | Not started | — | — | — |
@@ -256,6 +258,49 @@ The separate `LessonChecks.swift` was compiled with the same header, assembly ob
 | Final understanding questions | All four assessed; step-over behavior, LR naming, and post-add W/X state clarified. | Met with corrections explained |
 
 This documentation-only progress commit follows the inspected source snapshot. It does not add implementation code or fabricate debugger transcripts.
+
+## M02-L01 review — 2026-11-15
+
+- Implementation commit: f01291a9ce85281943b4204289dd34322fc956cb.
+- Previous reviewed implementation commit: 85a0040f242a01d79c9b1a3890da29da2c2586fe.
+- Files inspected: complete ImageEngine/Pixel.s, ImageEngine/Pixel.h, ImageEngine/main.swift, learning/progress.md, tutor guidance, and the complete M02-L01 lesson. Course guide and memory/Swift and debugging references were read earlier in this teaching session. Comparison from the previous reviewed implementation includes the prior M01-L05 progress update and the three implementation files in this new commit.
+- Reviewer environment: native arm64 macOS 27.2.1 (26B131), Apple Swift 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1), Apple Clang 21.0.0 (clang-2100.4.1.1), macOS 27.2 SDK. Exact source files fetched from the named commit were copied into /private/tmp/imageengine-review-f01291a9 for execution.
+- Outcome: **Changes requested** for one declaration-contract documentation omission. Arithmetic and pointer use in the supplied four-byte driver are correct. Debugger evidence and understanding assessment also remain pending; M02-L02 has not been opened.
+- Evidence executed by reviewer: assembled the exact committed assembly, compiled the unchanged committed Swift runner, and ran it successfully. Existing checks passed; new output was Inverted pixel: [245, 235, 225, 99] and Opaque pixel: [245, 235, 225, 255]. A separate reviewer-created runner linked the same assembly object and passed the three lesson expectations plus 768 assertions across 256 fixtures covering every byte value, RGB/alpha preservation, and double inversion. These supplementary checks are reviewer evidence, not committed project tests.
+- Evidence supplied by learner: reported pushing a new commit. No M02-L01 command output, debugger transcript, or end-of-lesson answers were supplied. The teaching conversation has reached step 3; this review identifies the remaining final-step work.
+- Static inspection: inversion loads/stores only offsets 0, 1, and 2; the alpha setter stores only offset 3. Both retain X0, use caller-saved W1/W2, make no nested calls, do not touch preserved registers or X18, and return normally. Swift calls are synchronous and scoped to mutable-buffer closures over an explicit four-byte array, with no pointer escape or overlapping array access. Earlier functions are preserved.
+- Required fix: document beside invert_pixel that its argument must address at least four consecutive writable RGBA bytes, RGB is inverted in place, alpha is preserved, and the pointer is not retained. Its declaration currently has no contract comment. The setter's declaration already contains its required four-byte contract. No numerical or ABI defect was found.
+- Reason/example for the contract fix: an empty or undersized buffer is not a valid argument; the kernel has no length parameter and immediately accesses memory. The current four-byte example is valid, but its declaration should state the caller obligation as required by the shared course contract.
+- Optional improvements: retain explicit failure checks for the three pixel results in the learner's runner; it currently prints the first two and does not exercise a second pointer-based inversion. Reviewer execution verifies that second inversion restores RGB, but does not add it to the learner's source.
+- Static-only / unverified items: no actual LLDB byte trace was supplied or executed by the reviewer; teaching examples are expected bytes, not captured output. The learner's local executable/working-tree correspondence is unknown. The Xcode target, release mode, and performance were not tested in this review and are not required for M02-L01.
+- Understanding questions: all four are pending: (1) What is in X0: the pixel or its address? (2) Why does strb not change the following byte? (3) Why is the pointer valid inside the closure? (4) Why is the single-pixel function not valid for an empty buffer?
+- Next action: add the declaration contract, provide the brief entry/after-return memory excerpts from step 3, and answer the four final questions. Review any new implementation hash and assess the answers before marking Ready.
+
+| Completion requirement | Evidence | Status |
+| --- | --- | --- |
+| Complete RGB-inversion function and matching C declaration | Exported symbol, uint8_t pointer declaration, byte loads/stores at offsets 0–2, and matching Swift call inspected; compiled and executed. | Met |
+| Alpha preserved by inversion | Committed example produced [245,235,225,99]; supplementary cases preserve each original alpha. | Met |
+| Alpha-only setter and its four-byte precondition | Header contract present; one strb at offset 3; expected [245,235,225,255] executed; supplementary cases preserve RGB. | Met |
+| Caller obligations beside the inversion declaration | invert_pixel declaration lacks the four-writable-byte precondition and behavior/lifetime comment taught in step 1 and required by the shared guide. | Missing |
+| Scoped Swift borrowing and valid four-byte storage | Explicit [UInt8] array has four elements; optional pointer unwrapped inside each mutable borrow, synchronous calls, no escaping address or independent access during borrow. | Met |
+| Required inversion/setter/second-inversion results | Reviewer executed all three: [245,235,225,99], [245,235,225,255], [10,20,30,255]. Supplementary checks also verify full restoration when alpha has not been changed. | Met by reviewer execution |
+| Earlier value-based functions and regressions | All preserved; unchanged committed runner's existing packing/extraction, double-inversion, and row-byte checks passed. | Met |
+| Byte-oriented memory trace at entry and after return | No actual LLDB excerpts submitted or executed in this review. | Unverified |
+| Final understanding questions | No answers supplied yet; all four requested in the final review response. | Unverified |
+
+Successful commands run in /private/tmp/imageengine-review-f01291a9:
+
+```bash
+xcrun clang -arch arm64 -g -c Pixel.s -o Pixel.o
+xcrun swiftc -g -Onone -module-cache-path /private/tmp/imageengine-review-f01291a9/module-cache -import-objc-header Pixel.h main.swift Pixel.o -o pixel
+./pixel
+xcrun swiftc -parse-as-library -g -Onone -module-cache-path /private/tmp/imageengine-review-f01291a9/module-cache -import-objc-header Pixel.h LessonChecks.swift Pixel.o -o lesson-checks
+./lesson-checks
+```
+
+The supplementary runner initially needed -parse-as-library for its @main entry point; recompiling with that flag succeeded. This was a reviewer-harness invocation issue, not a project source defect. The supplementary runner printed: PASS: 3 lesson checks and 768 boundary/value checks.
+
+This update records the review honestly, preserves prior history, and changes only learning/progress.md.
 
 ## How to resume
 
