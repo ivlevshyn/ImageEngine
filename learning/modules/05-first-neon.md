@@ -1,6 +1,6 @@
 # Module 05 — Your first NEON implementations
 
-Prerequisite: Module 04. NEON is Arm Advanced SIMD. We use baseline AArch64 vector instructions, not optional dot-product/SVE/SME instructions. Each vector implementation retains its scalar counterpart. All checks and questions occur after the whole lesson.
+Prerequisite: Module 04. NEON is Arm Advanced SIMD. We use baseline AArch64 vector instructions, not optional dot-product/SVE/SME instructions. Each vector implementation retains its scalar counterpart. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M05-L01 — One instruction, multiple lanes
 
@@ -30,13 +30,9 @@ For color 0xff332211, V0 has four equal 32-bit lanes. In memory it becomes `11 2
 
 Create `src/asm/neon.s`, add the declaration, and call it on a 16-byte active region inside a larger marker buffer. Keep this fixed-size teaching API explicitly named `fill4`; do not pretend it handles arbitrary counts yet. Compare the bytes with `fill_rgba_scalar` called for four pixels. Use LLDB to inspect V0/Q0 through the available vector register view on your toolchain.
 
-### After completing the whole lesson
+**Expected behavior in code:** four repeated packed pixels exactly match scalar output; surrounding markers unchanged; colors with different channel values expose byte-order mistakes. This API must not be called on fewer than four pixels.
 
-**Checks:** four repeated packed pixels exactly match scalar output; surrounding markers unchanged; colors with different channel values expose byte-order mistakes. This API must not be called on fewer than four pixels.
-
-**Questions:** What does `.4s` mean here? Is Q0 separate storage from V0? How many pixels fit in 16 bytes? Why is a fixed-size function's precondition different from a general image loop?
-
-**Completion rubric:** correct lane explanation, complete fixed-block routine, exact byte comparison, and explicit 16-byte precondition. Commit: `M05-L01: fill four pixels with NEON`.
+**Implementation scope:** correct lane explanation, complete fixed-block routine, exact byte comparison, and explicit 16-byte precondition. Commit: `M05-L01: fill four pixels with NEON`.
 
 ## M05-L02 — Invert RGB while preserving alpha
 
@@ -66,13 +62,9 @@ The general-purpose W1 holds a value copied into a vector register. The load rea
 
 Add the fixed-block function and compare against scalar inversion on four pixels whose alpha values are 0,1,128,255. Write a short lane diagram as a Markdown table: lane byte index, input meaning, mask value, output rule. Keep the scalar function unchanged. Add no arbitrary-length wrapper until the next lesson's bounds are implemented.
 
-### After completing the whole lesson
+**Expected behavior in code:** all RGB channels invert and alpha stays exact; two calls restore the block; sentinel bytes remain unchanged; scalar and SIMD outputs match. Include a deliberately nonuniform pixel block so copying a single pixel four times fails visibly.
 
-**Checks:** all RGB channels invert and alpha stays exact; two calls restore the block; sentinel bytes remain unchanged; scalar and SIMD outputs match. Include a deliberately nonuniform pixel block so copying a single pixel four times fails visibly.
-
-**Questions:** Why use a mask instead of NOT? Does `.16b` mean the image now has sixteen channels? What does the load access before any masking? Why is the scalar reference still valuable for a simple operation?
-
-**Completion rubric:** correct mask, full block access contract, alpha preservation, lane explanation, and exact comparison. Commit: `M05-L02: invert four pixels with a NEON mask`.
+**Implementation scope:** correct mask, full block access contract, alpha preservation, lane explanation, and exact comparison. Commit: `M05-L02: invert four pixels with a NEON mask`.
 
 ## M05-L03 — Full vectors and scalar tails
 
@@ -110,13 +102,9 @@ Declare `void fill_rgba_neon(uint8_t *dst, uint64_t pixels, uint32_t rgba);`, ma
 
 Add the complete fill and write `invert_row_neon(data,pixels)` using the same control structure, the earlier vector mask, and a scalar packed-pixel XOR tail. Write a Swift image wrapper that calls the row kernel for each active row using stride. Keep processing within each row so padding cannot become a tail's accidental input.
 
-### After completing the whole lesson
+**Expected behavior in code:** counts 0…17; widths 3,4,5 and 15,16,17; base offsets 0…15 inside an adequately sized allocation; padded multirow images. Compare exact active bytes and all surrounding markers with scalar results. Inspect load bounds separately: unchanged markers detect writes, not invalid reads.
 
-**Checks:** counts 0…17; widths 3,4,5 and 15,16,17; base offsets 0…15 inside an adequately sized allocation; padded multirow images. Compare exact active bytes and all surrounding markers with scalar results. Inspect load bounds separately: unchanged markers detect writes, not invalid reads.
-
-**Questions:** Why does unsigned comparison fit this loop? Why does masking after an out-of-bounds load not fix it? Why restart the tail logic each row? Can an unaligned address still be valid?
-
-**Completion rubric:** correct zero/full/tail paths, no rounded-up accesses, per-row stride handling, and offset tests. Commit: `M05-L03: handle NEON tails safely`.
+**Implementation scope:** correct zero/full/tail paths, no rounded-up accesses, per-row stride handling, and offset tests. Commit: `M05-L03: handle NEON tails safely`.
 
 ## M05-L04 — Saturating vector brightness
 
@@ -145,13 +133,9 @@ Saturation happens independently per byte. The zero alpha lane preserves any alp
 
 Add `brightness_row_neon(data,pixels,delta)` with the same validated delta interval as M04. Select a loop before processing pixels rather than branching separately for every channel. Provide correct scalar tails and a Swift image wrapper. Keep the scalar image version selectable for comparison. Document scratch registers and which instructions change flags so tail control does not accidentally use stale conditions.
 
-### After completing the whole lesson
+**Expected behavior in code:** deltas -255,-1,0,1,255; channels 0,1,127,254,255; multiple alpha values; all remainder lengths; padding/offset cases. Compare exact bytes with scalar output. Reject out-of-contract delta before negating or narrowing it.
 
-**Checks:** deltas -255,-1,0,1,255; channels 0,1,127,254,255; multiple alpha values; all remainder lengths; padding/offset cases. Compare exact bytes with scalar output. Reject out-of-contract delta before negating or narrowing it.
-
-**Questions:** Why not use wrapping `add`? Why choose sign outside the pixel loop? How does a zero adjustment preserve alpha? When would wider intermediate lanes be necessary instead?
-
-**Completion rubric:** exact signed-delta semantics, safe tails, alpha preservation, and no byte reinterpretation of negative deltas. Commit: `M05-L04: add saturating NEON brightness`.
+**Implementation scope:** exact signed-delta semantics, safe tails, alpha preservation, and no byte reinterpretation of negative deltas. Commit: `M05-L04: add saturating NEON brightness`.
 
 ## M05-L05 — Establish a differential test matrix
 
@@ -179,13 +163,9 @@ Generate cases across widths 0…33, heights 0,1,2,7, and several legal strides.
 
 Keep a separate small suite of exact known values. Include base-offset tests on raw row kernels. Do not claim AddressSanitizer automatically instruments handwritten assembly accesses. Optional guarded-page fixtures can make overreads observable, but require additional explained OS scaffolding; static loop-bound reasoning remains required now.
 
-### After completing the whole lesson
+**Expected behavior in code:** both debug and release builds pass; a deliberately wrong alpha mask or missing tail produces an informative failure, then is fixed; the same seed reproduces the same input. Preserve the bug-revealing case as a regression.
 
-**Checks:** both debug and release builds pass; a deliberately wrong alpha mask or missing tail produces an informative failure, then is fixed; the same seed reproduces the same input. Preserve the bug-revealing case as a regression.
-
-**Questions:** Why can two implementations agree and both be wrong? What errors do sentinels detect, and what do they miss? Why allow wrapping in this generator but not size validation? Why are odd widths valuable?
-
-**Completion rubric:** deterministic suite, independent known answers, clear diagnostics, alpha/padding coverage, and honest evidence limits. Commit: `M05-L05: validate scalar and NEON equivalence`.
+**Implementation scope:** deterministic suite, independent known answers, clear diagnostics, alpha/padding coverage, and honest evidence limits. Commit: `M05-L05: validate scalar and NEON equivalence`.
 
 ## Module references
 

@@ -16,7 +16,7 @@ Start with direct compiler commands so each build stage is visible. A `build.sh`
 | `src/swift/Checks.swift` | M02 | Test helpers and fixtures; used by `--self-test`. |
 | `build.sh` | M02 | Reproducible debug/release builds. |
 | `tests/fixtures/` | M02 | Tiny generated images and exact expected bytes. |
-| `tests/results/` | As needed | Small text evidence, not compiled binaries. |
+| `tests/results/` | Optional | Personal diagnostic notes, not required evidence submissions or compiled binaries. |
 | `bench/` | M09 | Benchmark configuration, results, and method notes. |
 | `docs/` | M10 | Your project API and release documentation. |
 
@@ -53,13 +53,15 @@ The C boundary is a trusted internal interface: assembly relies on validated siz
 
 These are course choices. [Image mathematics](reference/image-math.md) explains the reasons and useful invariants. A performance optimization cannot silently change them.
 
-## Testing and review cadence
+## Teaching, implementation tests, and code checks
 
-Teach each lesson over several messages, one manageable step per message. Start with the purpose and a brief step outline, then pause after each nonfinal step until the learner asks to continue. Cover every lesson requirement across the steps. Steps control pacing; the lesson remains one review unit. Lessons include build/run instructions as part of implementation, but all required checks, comprehension questions, and assessment belong in the final step, after the full lesson's teaching and implementation tasks. Do not add intermediate quizzes or require verification reports to continue. Preserve earlier checks and run relevant regressions when shared functions change. `--self-test` should exit nonzero on failure and print enough context to identify the input, expected result, and actual result.
+Teach each lesson over several messages, one manageable step per message. Start with the purpose and a brief step outline, then pause after each nonfinal step until the learner asks to continue. Finish after the teaching and implementation tasks. Do not add an end-of-lesson checks/review step, quiz, comprehension questions, answer assessment, or approval gate.
 
-Tests begin as plain Swift checks, with no testing framework prerequisite. Release-mode verification must not rely solely on `assert`, which may be removed by optimization. Use explicit failures such as `fatalError` in the course's small runner. At SIMD stages, compare scalar and vector results and independently verify selected hand-calculated cases. Random tests use a recorded deterministic seed.
+Build/run examples, debugging, and tests are practical implementation work. Expected behavior listed in a module describes the code and its repository tests; it does not require an additional final step, report, or submission. Preserve earlier tests and add focused regressions when shared functions change. `--self-test` should exit nonzero on failure and print enough context to identify the input, expected result, and actual result.
 
-Every lesson has an end section covering checks, questions, and a completion rubric. Save answers in a learner-created `learning/answers/Mxx-Lyy.md` if convenient, or provide them in the review message. This optional directory contains your learning notes, not generated implementation. A review is complete only when requirements, relevant runtime evidence, and understanding questions have been assessed.
+Tests begin as plain Swift checks, with no testing framework prerequisite. Release-mode tests must not rely solely on `assert`, which may be removed by optimization. Use explicit failures such as `fatalError` in the course's small runner. At SIMD stages, compare scalar and vector results and independently verify selected hand-calculated cases. Random tests use a deterministic seed in the code.
+
+Check the committed implementation directly in the GitHub repository at an exact revision. Use relevant source, declarations, callers, and repository tests to identify concrete code defects. Do not require the learner to submit answers, command output, logs, screenshots, debugger traces, environment records, or other evidence. Personal notes and diagnostic captures are optional. Keep code-check feedback brief and distinguish code inspection from tests actually executed; unavailable native execution alone does not block completion. Record the checked implementation commit and lesson status in progress.md. Ready means complete under this repository-code policy.
 
 ## Time and scope
 
@@ -69,6 +71,6 @@ Learn native macOS user-space code first. No direct Darwin syscalls, custom allo
 
 ## Toolchain setup policy
 
-Use Apple's installed development tools via `xcrun`; record `xcode-select -p`, `xcrun swiftc --version`, `xcrun clang --version`, `xcrun --show-sdk-version`, `uname -m`, and `sw_vers`. Baseline commands assume native `arm64` execution. If tools are missing, install/select an appropriate Xcode or Command Line Tools release for your OS using Apple's documented process. Do not guess a version number from the machine model. Tool upgrades are not required unless a concrete incompatibility is observed.
+Use Apple's installed development tools via `xcrun`; inspect when needed `xcode-select -p`, `xcrun swiftc --version`, `xcrun clang --version`, `xcrun --show-sdk-version`, `uname -m`, and `sw_vers`. Baseline commands assume native `arm64` execution. If tools are missing, install/select an appropriate Xcode or Command Line Tools release for your OS using Apple's documented process. Do not guess a version number from the machine model. Tool upgrades are not required unless a concrete incompatibility is observed.
 
 Examples are original teaching code. Official resources are linked in [resources](reference/resources.md). They define platform behavior; this guide defines our project behavior. Consult [validation notes](validation.md) before interpreting package checks as native Mac testing.

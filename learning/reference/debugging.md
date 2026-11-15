@@ -40,9 +40,9 @@ Reduce the image to the smallest dimensions that still fail. Give pixels distinc
 
 For a vector loop, record the remaining count, current pointer offset, lane arrangement, bytes read, and bytes written. Look at the last full block and first tail operation. A correct output checksum cannot show which lane was wrong; byte-level diagnostics can.
 
-## Evidence to save for review
+## Optional debugging notes
 
-Save the command, implementation commit, input fixture or deterministic seed, relevant register/memory excerpt, expected/actual bytes, and eventual diagnosis. A screenshot can help but searchable text is preferable. Do not paste a whole process memory dump. Rebuild after editing: debugging stale machine code is a common avoidable source of confusion.
+For your own use, you may save the command, implementation commit, input fixture or deterministic seed, relevant register/memory excerpt, expected/actual bytes, and eventual diagnosis. These notes, screenshots, and traces are optional; no submission is required for lesson completion. Avoid whole process memory dumps. Rebuild after editing: debugging stale machine code is a common avoidable source of confusion.
 
 ## Assembly and sanitizers
 

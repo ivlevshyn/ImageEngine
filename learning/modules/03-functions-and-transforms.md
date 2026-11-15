@@ -1,6 +1,6 @@
 # Module 03 — Reliable functions and transformations
 
-Prerequisite: Module 02. Keep the same pixel layout and build script. Start `src/asm/transforms.s` when useful; the script already builds multiple assembly files. Existing kernels remain available. All assessment occurs after each complete lesson.
+Prerequisite: Module 02. Keep the same pixel layout and build script. Start `src/asm/transforms.s` when useful; the script already builds multiple assembly files. Existing kernels remain available. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M03-L01 — Make function contracts explicit
 
@@ -30,13 +30,9 @@ Document every existing assembly declaration with units, range, touched bytes, e
 
 For a future crop, write the proposed validation using `originX <= source.width` and `cropWidth <= source.width-originX` after checking nonnegativity. Subtracting from a known valid bound avoids overflowing an unchecked `originX+cropWidth`. Do not implement crop yet.
 
-### After completing the whole lesson
+**Expected behavior in code:** invalid public parameters fail before reaching assembly; empty pointwise images are no-ops; padding tests still pass; no wrapper uses a pointer outside its borrow. The code check can follow one valid and one invalid path.
 
-**Checks:** invalid public parameters fail before reaching assembly; empty pointwise images are no-ops; padding tests still pass; no wrapper uses a pointer outside its borrow. Have the reviewer trace one valid and one invalid path.
-
-**Questions:** What cannot a raw pointer tell the callee? Does `const` imply exclusive access? How do identical buffers differ from partially overlapping buffers? Why validate ranges with subtraction?
-
-**Completion rubric:** complete existing API contracts, centralized checked size policy, and a clear division between public validation and trusted kernels. Commit: `M03-L01: document and enforce image contracts`.
+**Implementation scope:** complete existing API contracts, centralized checked size policy, and a clear division between public validation and trusted kernels. Commit: `M03-L01: document and enforce image contracts`.
 
 ## M03-L02 — Call assembly from assembly
 
@@ -87,13 +83,9 @@ The exclamation mark on the first store is pre-index writeback: reserve 64 bytes
 
 Use this function in `Image.fillScalar` instead of a Swift row loop. Add comments that explain the stack layout and register roles. In LLDB, step over one row call and observe that scratch registers may change while the saved loop state survives. Add assembly unwind/CFI annotations only as an explained extension after the basic frame is understood; the reference discusses their role.
 
-### After completing the whole lesson
+**Expected behavior in code:** empty, padded, and multirow fills match the previous Swift-driven behavior. Inspect that every return path restores SP and all touched preserved registers. Observe the return address before and after a nested call.
 
-**Checks:** empty, padded, and multirow fills match the previous Swift-driven behavior. Inspect that every return path restores SP and all touched preserved registers. Observe the return address before and after a nested call.
-
-**Questions:** Why does `bl` make saving X30 necessary? Why not keep the row count in X1 across the call? Why reserve 64 bytes when saved values use 56? Why must a W23 write still restore the original X23?
-
-**Completion rubric:** correct stack layout, restored preserved state, correct rows/padding, and a nested-call trace. Commit: `M03-L02: compose assembly functions safely`.
+**Implementation scope:** correct stack layout, restored preserved state, correct rows/padding, and correct nested-call state; a saved trace is optional. Commit: `M03-L02: compose assembly functions safely`.
 
 ## M03-L03 — Crop into a new image
 
@@ -132,13 +124,9 @@ Copying packed pixels preserves all four channels. Update source and destination
 
 Add `Image.cropped(x:y:width:height:) throws -> Image`. Check nonnegative coordinates/sizes and bounds before forming offsets. Allocate a fresh destination; borrow the source immutably and destination mutably. Snapshot dimensions before entering closures. Return an empty image for a valid zero-sized crop. Do not force unwrap empty base addresses. The tutor supplies the nested Swift borrowing pattern from the memory reference.
 
-### After completing the whole lesson
+**Expected behavior in code:** crop a labeled 4-by-3 image at origin (1,1) to 2-by-2; result pixels must be exactly source coordinates (1,1),(2,1),(1,2),(2,2). Test full-image crop, last single pixel, padded source/destination, empty legal crop, and out-of-range origins. Input bytes never change.
 
-**Checks:** crop a labeled 4-by-3 image at origin (1,1) to 2-by-2; result pixels must be exactly source coordinates (1,1),(2,1),(1,2),(2,2). Test full-image crop, last single pixel, padded source/destination, empty legal crop, and out-of-range origins. Input bytes never change.
-
-**Questions:** Which stride locates the next source row? Why does the new image simplify overlap rules? What prevents multiplication overflow here? What makes an empty crop valid even at an image edge?
-
-**Completion rubric:** exact coordinate mapping, two correct strides, independent destination, validated bounds, and no source writes. Commit: `M03-L03: crop image regions`.
+**Implementation scope:** exact coordinate mapping, two correct strides, independent destination, validated bounds, and no source writes. Commit: `M03-L03: crop image regions`.
 
 ## M03-L04 — Flip horizontally in place
 
@@ -164,13 +152,9 @@ Both loads precede both stores so neither original value is lost. Packed-word ac
 
 Declare `flip_horizontal_scalar(data,width,height,stride)` with the same types as inversion. Write complete loops around the fragment. Use `lsr` by one to obtain the unsigned pair count. Add a Swift wrapper and CLI operation. Document why an in-place swap is allowed here while crop uses disjoint storage.
 
-### After completing the whole lesson
+**Expected behavior in code:** rows `[A,B,C,D]` become `[D,C,B,A]`; `[A,B,C]` becomes `[C,B,A]`; widths 0,1,2,3,5 and padded images work. Two flips recover all original bytes, including unchanged padding. Give each pixel distinct RGBA values so channel-order mistakes cannot hide.
 
-**Checks:** rows `[A,B,C,D]` become `[D,C,B,A]`; `[A,B,C]` becomes `[C,B,A]`; widths 0,1,2,3,5 and padded images work. Two flips recover all original bytes, including unchanged padding. Give each pixel distinct RGBA values so channel-order mistakes cannot hide.
-
-**Questions:** Why stop after width/2 swaps? Why load both pixels before either store? What underflows if width zero is not guarded? Why is reversing the whole allocation incorrect?
-
-**Completion rubric:** correct odd/even behavior, preserved pixel channels/padding, safe empty case, and involution test. Commit: `M03-L04: flip rows in place`.
+**Implementation scope:** correct odd/even behavior, preserved pixel channels/padding, safe empty case, and involution test. Commit: `M03-L04: flip rows in place`.
 
 ## M03-L05 — Flip vertically and consolidate the API
 
@@ -188,13 +172,9 @@ Add `flip_vertical_scalar(data,width,height,stride)` and its Swift wrapper. Orga
 
 Create a small transformation demonstration from a labeled 3-by-3 image: original, crop, horizontal flip, vertical flip, and both flips. For geometric inspection, use visibly different corners. For correctness, compare exact pixels. Keep command parsing small and explained; the CLI is supporting scaffolding.
 
-### After completing the whole lesson
+**Expected behavior in code:** vertical twice restores the image; a single-row image stays unchanged; 0-by-N and N-by-0 do not dereference; row padding remains at its original offsets. Horizontal followed by vertical equals vertical followed by horizontal for the same image. All earlier tests still pass after any file moves.
 
-**Checks:** vertical twice restores the image; a single-row image stays unchanged; 0-by-N and N-by-0 do not dereference; row padding remains at its original offsets. Horizontal followed by vertical equals vertical followed by horizontal for the same image. All earlier tests still pass after any file moves.
-
-**Questions:** Why not swap padding too? Does a 180-degree turn reverse channels? Which geometric operations require new storage in our current API? What evidence would distinguish a pointer-arithmetic bug from a pixel-format bug?
-
-**Completion rubric:** complete vertical transform, compositional check, stable header/Swift interfaces, and documented overlap rules. Commit: `M03-L05: complete scalar geometry operations`.
+**Implementation scope:** complete vertical transform, compositional check, stable header/Swift interfaces, and documented overlap rules. Commit: `M03-L05: complete scalar geometry operations`.
 
 ## Module references
 

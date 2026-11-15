@@ -1,6 +1,6 @@
 # Module 09 — Performance engineering
 
-Prerequisite: Module 08. Correctness remains required; no speedup is presumed. Native measurements must be made on the learner's Mac. A slower experiment can be a successful lesson if it is measured, explained, and not installed as an unjustified default. Checks and questions follow the whole lesson.
+Prerequisite: Module 08. Correctness remains required; no speedup is presumed. Native measurements must be made on the learner's Mac. A slower experiment can be a successful lesson if it is measured, explained, and not installed as an unjustified default. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M09-L01 — Build a trustworthy benchmark
 
@@ -30,13 +30,9 @@ Create a `--bench` mode and `bench/README.md`. Record hardware as reported local
 
 Start with inversion because repeated in-place operations remain controlled. Restore input outside each timed batch if required by another operation. Use release builds. Do not run under LLDB for timing. Avoid assuming fixed CPU frequency, core assignment, or a particular number of performance cores.
 
-### After completing the whole lesson
+**Expected behavior in code:** output correctness checked outside timing; no file I/O/allocation in the intended kernel interval; consistent units; repeated runs produce interpretable distributions; an empty or trivial timed body helps identify overhead. Save raw samples, not just the fastest run.
 
-**Checks:** output correctness checked outside timing; no file I/O/allocation in the intended kernel interval; consistent units; repeated runs produce interpretable distributions; an empty or trivial timed body helps identify overhead. Save raw samples, not just the fastest run.
-
-**Questions:** Why use batches and a monotonic clock? Why distinguish wrapper cost from kernel cost? Why might repeated brightness operations change the workload? What does a checksum fail to prove?
-
-**Completion rubric:** reproducible harness, relevant metadata, raw samples, output validation, and clearly delimited timed work. Commit: `M09-L01: benchmark processing reproducibly`.
+**Implementation scope:** reproducible harness, relevant metadata, raw samples, output validation, and clearly delimited timed work. Commit: `M09-L01: benchmark processing reproducibly`.
 
 ## M09-L02 — Compare implementations and inspect compiler output
 
@@ -60,13 +56,9 @@ Provide optimized Swift baselines for inversion and grayscale using the same mat
 
 Annotate a short relevant disassembly excerpt: loop, loads/stores, arithmetic, and tail if visible. Explain one surprising result, including the possibility that Swift equals or beats handwritten code. Do not call different output semantics a speedup.
 
-### After completing the whole lesson
+**Expected behavior in code:** all baselines pass the same known-answer suite; timing conditions match; the report identifies actual observed vectorization rather than guessing; evidence includes command, binary revision, and metadata.
 
-**Checks:** all baselines pass the same known-answer suite; timing conditions match; the report identifies actual observed vectorization rather than guessing; evidence includes command, binary revision, and metadata.
-
-**Questions:** Why can optimized Swift use SIMD? Why is a tiny-image result not representative of all sizes? How can wrapper overhead hide kernel improvements? Why inspect the executable actually benchmarked?
-
-**Completion rubric:** fair three-way comparison, code inspection, correct units, and no predetermined performance conclusion. Commit: `M09-L02: compare compiler and handwritten kernels`.
+**Implementation scope:** fair three-way comparison, code inspection, correct units, and no predetermined performance conclusion. Commit: `M09-L02: compare compiler and handwritten kernels`.
 
 ## M09-L03 — Unroll with a hypothesis
 
@@ -94,13 +86,9 @@ For inversion, independent loads/XOR/stores may offer a simpler unrolling experi
 
 Create a separately named 2x or 4x unrolled variant of inversion or sum-red. Preserve the original. Document the dependency you intend to shorten or overhead you intend to reduce. Keep a correct vector remainder loop and scalar tail. Compare several image sizes using the established harness; inspect instruction count/register use and note whether spills or extra preserved-register saves appear.
 
-### After completing the whole lesson
+**Expected behavior in code:** exact correctness suite, all new block-boundary counts, zero/tiny cases, ABI state preservation, repeated benchmark samples. Report regressions as well as gains. Select a new default only if the evidence supports it for the intended workload.
 
-**Checks:** exact correctness suite, all new block-boundary counts, zero/tiny cases, ABI state preservation, repeated benchmark samples. Report regressions as well as gains. Select a new default only if the evidence supports it for the intended workload.
-
-**Questions:** How do independent accumulators differ from repeatedly updating one? What costs can unrolling add? Why test lengths just below the new block size? Why might a large-image gain hurt small images?
-
-**Completion rubric:** explicit hypothesis, isolated variant, correct remainder paths, reproducible result, and a justified adoption decision. Commit: `M09-L03: evaluate loop unrolling`.
+**Implementation scope:** explicit hypothesis, isolated variant, correct remainder paths, reproducible result, and a justified adoption decision. Commit: `M09-L03: evaluate loop unrolling`.
 
 ## M09-L04 — Memory traffic and cache locality
 
@@ -118,13 +106,9 @@ Benchmark at least three dimensions spanning small and large working sets, two l
 
 Try one justified locality change, such as retaining only three horizontal-sum rows in a ring buffer for blur instead of the entire H image. For correctness, row buffers must stay alive until the vertical pass consumes them; global top/bottom replication still applies. This experiment prepares the next module's tile discussion. Preserve a straightforward full-H version as an oracle.
 
-### After completing the whole lesson
+**Expected behavior in code:** all modified algorithms match references; ring reuse does not overwrite a still-needed row; reported storage accounting is correct; raw timing samples include workload policy; stride changes do not alter active pixels.
 
-**Checks:** all modified algorithms match references; ring reuse does not overwrite a still-needed row; reported storage accounting is correct; raw timing samples include workload policy; stride changes do not alter active pixels.
-
-**Questions:** Why can repeated small images look much faster per pixel? What distinguishes active-byte throughput from memory-bus traffic? How can reducing temporary storage improve performance? What dependency determines when a row buffer can be reused?
-
-**Completion rubric:** controlled memory experiments, honest terminology, correct locality variant, and evidence-based explanation. Commit: `M09-L04: measure and improve memory locality`.
+**Implementation scope:** controlled memory experiments, honest terminology, correct locality variant, and evidence-based explanation. Commit: `M09-L04: measure and improve memory locality`.
 
 ## M09-L05 — Fuse operations without changing semantics
 
@@ -149,13 +133,9 @@ Implement `invert_then_brightness_row_neon` with full parameter validation, alph
 
 Benchmark total pipeline time and memory footprint, not just the inner arithmetic fragment. Include small and large images. Retain the simple sequential path for debugging and as a reference.
 
-### After completing the whole lesson
+**Expected behavior in code:** all deltas and endpoint channels; alpha/padding; reordered-operation counterexample; fused/unfused exact equality; benchmark includes the complete supported pair and labels allocation policy.
 
-**Checks:** all deltas and endpoint channels; alpha/padding; reordered-operation counterexample; fused/unfused exact equality; benchmark includes the complete supported pair and labels allocation policy.
-
-**Questions:** Why does operation order matter? What prevents arbitrary fusion across filters? Why can deferring rounding change semantics? Why might fusion outperform instruction-level tuning?
-
-**Completion rubric:** semantics-preserving fusion, narrow dispatch rule, retained reference, and measured pipeline benefit or documented lack of it. Commit: `M09-L05: fuse a measured pointwise pipeline`.
+**Implementation scope:** semantics-preserving fusion, narrow dispatch rule, retained reference, and measured pipeline benefit or documented lack of it. Commit: `M09-L05: fuse a measured pointwise pipeline`.
 
 ## Module references
 

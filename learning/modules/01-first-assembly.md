@@ -1,6 +1,6 @@
 # Module 01 — Your first assembly code
 
-Read [the guide](../course-guide.md) first. Work at the repository root. This module supplies complete small functions because the instruction vocabulary is new. Copying is expected; tracing and modifying the code is how you make it yours. Each lesson is taught across several messages, one manageable step at a time, following [the tutor guidance](../AGENTS.md). Pause between steps until the learner asks to continue. All checks and questions remain in the final step of the full lesson.
+Read [the guide](../course-guide.md) first. Work at the repository root. This module supplies complete small functions because the instruction vocabulary is new. Copying is expected; tracing and modifying the code is how you make it yours. Each lesson is taught across several messages, one manageable step at a time, following [the tutor guidance](../AGENTS.md). Pause between steps until the learner asks to continue. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M01-L01 — A Swift program calls your first assembly function
 
@@ -55,19 +55,15 @@ xcrun swiftc -g -Onone -import-objc-header src/bridge/Pixel.h src/swift/main.swi
 .build/pixel
 ```
 
-`-c` stops after producing the object. `-g` includes debugging information. `-Onone` keeps Swift easy to debug. The final command executes the program; no Rosetta or simulator is involved. Record the toolchain commands listed in the guide in a small note for later reviews.
+`-c` stops after producing the object. `-g` includes debugging information. `-Onone` keeps Swift easy to debug. The final command executes the program; no Rosetta or simulator is involved. Inspect the toolchain commands listed in the guide when needed; keeping a personal note is optional.
 
 ### Your implementation
 
 Create the three files yourself and reproduce the build. Add `.build/` to your own `.gitignore`. Then add a second function, `transparent_alpha`, returning zero, with a header declaration and a Swift call. Use the existing function as the model; explain the three places where the function's name appears. Keep the original opaque function.
 
-### After completing the whole lesson
+**Expected behavior in code:** both values print as 255 and 0; a clean rebuild after deleting only `.build/` works; `uname -m` reports native arm64. If it does not, investigate the execution environment before assuming these commands are native. Inspect compiler/SDK versions when diagnosing build issues; saving output is optional.
 
-**Checks:** both values print as 255 and 0; a clean rebuild after deleting only `.build/` works; `uname -m` reports native arm64. If it does not, investigate the execution environment before assuming these commands are native. Record compiler/SDK versions and the exact build output.
-
-**Questions:** What is the difference between declaring and implementing a function? Which line actually puts the result into a register? Why is the underscore in assembly but absent in Swift? What job does the linker do?
-
-**Completion rubric:** two callable functions, correct header declarations, reproducible build, no generated binaries committed, and explanations that distinguish assembler directives from instructions. Suggested commit: `M01-L01: call assembly alpha functions from Swift`.
+**Implementation scope:** two callable functions, correct header declarations, reproducible build, no generated binaries committed, and the taught distinction between assembler directives and instructions. Suggested commit: `M01-L01: call assembly alpha functions from Swift`.
 
 ## M01-L02 — Transform one color channel
 
@@ -107,13 +103,9 @@ Add the inversion function and keep earlier functions. Add a second function `do
 
 Use the same rebuild commands as L01 after every change. An object file is a compiled snapshot; editing source without rebuilding does not alter the executable.
 
-### After completing the whole lesson
+**Expected behavior in code:** inversion results are 255, 254, 215, 127, 0 for the displayed inputs. Doubling 200 produces 400. Inverting twice restores every tested valid channel. Do not claim the inversion contract covers input 400.
 
-**Checks:** inversion results are 255, 254, 215, 127, 0 for the displayed inputs. Doubling 200 produces 400. Inverting twice restores every tested valid channel. Do not claim the inversion contract covers input 400.
-
-**Questions:** Why can `w0` be both input and output? What happens if you swap subtraction's source operands? Why is 400 acceptable in UInt32 but not in an 8-bit channel? What does the input-range promise contribute?
-
-**Completion rubric:** correct functions, declared domains, expected examples, and a register trace for input 40. Suggested commit: `M01-L02: transform scalar channels`.
+**Implementation scope:** correct functions, declared domains, expected examples, and the worked register behavior for input 40; saving a trace is optional. Suggested commit: `M01-L02: transform scalar channels`.
 
 ## M01-L03 — Pack and unpack an RGBA pixel
 
@@ -157,13 +149,9 @@ and w0, w0, #255
 
 Add pack, red, green, blue, and alpha extraction functions. Keep the domain explicit rather than silently masking invalid packing arguments. Add Swift output that labels the hexadecimal packed value and each extracted channel. Create one packed pixel from decimal inputs and another from hexadecimal inputs to see that notation does not change the bits.
 
-### After completing the whole lesson
+**Expected behavior in code:** `(0x11,0x22,0x33,0x44)` packs to `0x44332211`; black opaque packs to `0xff000000`; white opaque to `0xffffffff`. Extraction returns the original channels, including zero and 255. Do not reverse byte order merely because hexadecimal is written most significant digit first.
 
-**Checks:** `(0x11,0x22,0x33,0x44)` packs to `0x44332211`; black opaque packs to `0xff000000`; white opaque to `0xffffffff`. Extraction returns the original channels, including zero and 255. Do not reverse byte order merely because hexadecimal is written most significant digit first.
-
-**Questions:** Why is masking needed after extracting green? Why does OR work here without carrying between fields? What would an out-of-contract input of 256 do to packing? Is the leftmost hexadecimal byte our red channel?
-
-**Completion rubric:** five functions with declarations, round-trip examples, and a correct bit-position explanation. Suggested commit: `M01-L03: pack and unpack RGBA values`.
+**Implementation scope:** five functions with declarations, round-trip examples, and correct bit positions. Suggested commit: `M01-L03: pack and unpack RGBA values`.
 
 ## M01-L04 — Register width and integer interpretation
 
@@ -207,13 +195,9 @@ Swift normally checks overflow in ordinary integer arithmetic. Raw assembly addi
 
 Add the three functions and compare them from Swift using UInt32 values and UInt64 results. Document why row-byte calculation uses the X view. Write a short table for widths 0, 1, 3, and UInt32.max; no image allocation is needed. Explain that preserving a wide arithmetic result does not prove sufficient memory exists.
 
-### After completing the whole lesson
+**Expected behavior in code:** the two add functions agree on 0 and 254 but differ on UInt32.max; row-byte results are 0, 4, 12, and 17,179,869,180. Earlier packing and channel checks still work.
 
-**Checks:** the two add functions agree on 0 and 254 but differ on UInt32.max; row-byte results are 0, 4, 12, and 17,179,869,180. Earlier packing and channel checks still work.
-
-**Questions:** Does writing `w0` preserve the old high half of `x0`? Why is `mov w0,w0` useful here? Why would a W-register shift give a wrong large row size? What extra facts are needed before accessing that many bytes?
-
-**Completion rubric:** correct wide results, explicit type declarations, no giant allocation, and a distinction between arithmetic validity and memory validity. Suggested commit: `M01-L04: understand register width and size arithmetic`.
+**Implementation scope:** correct wide results, explicit type declarations, no giant allocation, and a distinction between arithmetic validity and memory validity. Suggested commit: `M01-L04: understand register width and size arithmetic`.
 
 ## M01-L05 — Follow the machine in LLDB
 
@@ -246,17 +230,13 @@ If the breakpoint does not resolve, use `image lookup -n invert_channel`, confir
 
 ### Your implementation
 
-Make the driver call inversion with 40 first so the trace is predictable. Capture a short text trace showing the entry value, the 255 scratch value, and the 215 result. Trace `widen_then_add_one` separately using UInt32.max. Add a learner note explaining the observed machine code and any aliases. Save only relevant output, not a huge debugger transcript.
+Make the driver call inversion with 40 first so the trace is predictable. Observe the entry value, the 255 scratch value, and the 215 result; optionally keep a short text trace for yourself. Trace `widen_then_add_one` separately using UInt32.max. Personal notes on the observed machine code and aliases are optional; no trace or transcript submission is required.
 
 You may temporarily introduce a subtraction-order error to observe its effect, then fix it before committing. The goal is to connect symptoms to state, not to memorize debugger commands.
 
-### After completing the whole lesson
+**Expected behavior in code:** all existing examples still produce their expected values; the debugger shows state before and after each relevant instruction; source and executable match the same build. Confirm the result register before `ret` rather than relying only on printed output.
 
-**Checks:** all existing examples still produce their expected values; the trace identifies state before and after each relevant instruction; source and executable match the same build. Confirm the result register before `ret` rather than relying only on printed output.
-
-**Questions:** What is the difference between `step-inst` and stepping over a function? Why can a breakpoint fail even when the source contains the function? What does `ret` use to know where to return? How did the width experiment appear in the debugger?
-
-**Completion rubric:** usable debug build, concise trace, fixed deliberate errors, and explanations connected to observed registers. Suggested commit: `M01-L05: document assembly execution in LLDB`.
+**Implementation scope:** usable debug build and fixed deliberate errors, with debugger exploration of the relevant registers; saved traces and explanations are optional. Suggested commit: `M01-L05: document assembly execution in LLDB`.
 
 ## Module references
 

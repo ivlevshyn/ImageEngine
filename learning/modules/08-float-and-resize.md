@@ -1,6 +1,6 @@
 # Module 08 — Floating point, resizing, and light
 
-Prerequisite: Module 07. Introduce floating-point concepts before requiring vector numerical work. Required resize/exposure/linear-filter paths initially use opaque images. All validation and questions occur after the whole lesson.
+Prerequisite: Module 07. Introduce floating-point concepts before requiring vector numerical work. Required resize/exposure/linear-filter paths initially use opaque images. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M08-L01 — Floating-point exposure
 
@@ -34,13 +34,9 @@ For nonnegative clamped values, adding 0.5 and truncating implements nearest wit
 
 Add a scalar row implementation and then a NEON path using byte-to-32-bit widening, `ucvtf`, vector multiplication/clamping, conversion, and narrowing. Start by tracing the scalar helper. Supply the Swift validation using `gain.isFinite`, range checks, and explicit Float conversion. Preserve alpha and tail rules. Validate the original user value before narrowing a wider type when that conversion could introduce infinity.
 
-### After completing the whole lesson
+**Expected behavior in code:** gains 0,0.5,1,1.25,16; saturation at 255; half-way rounding examples; NaN/infinity/negative gains reject; scalar and vector paths with the same operation schedule agree on the fixtures; alpha/padding unchanged.
 
-**Checks:** gains 0,0.5,1,1.25,16; saturation at 255; half-way rounding examples; NaN/infinity/negative gains reject; scalar and vector paths with the same operation schedule agree on the fixtures; alpha/padding unchanged.
-
-**Questions:** Why is `ucvtf` different from a bitwise move? Why does the gain arrive in S0? What rounding does `fcvtzu` perform? Why reject nonfinite values before the kernel?
-
-**Completion rubric:** explicit Float contract, valid mixed argument handling, scalar/vector conversion pipeline, and finite-parameter checks. Commit: `M08-L01: process exposure with floating point`.
+**Implementation scope:** explicit Float contract, valid mixed argument handling, scalar/vector conversion pipeline, and finite-parameter checks. Commit: `M08-L01: process exposure with floating point`.
 
 ## M08-L02 — Nearest-neighbor resizing
 
@@ -66,13 +62,9 @@ For source width 2 and destination width 4, source indices are 0,0,1,1. For sour
 
 Create a scalar resize routine with disjoint output. To keep the interface within eight general argument registers, use `resize_nearest_scalar(dst,dstStride,dstWidth,dstHeight,src,srcStride,srcWidth,srcHeight)`. All sizes are uint64. Swift validates allocation limits and opaque input, then supplies the buffers. Copy whole RGBA pixels. Derive source-row addresses once per output row where convenient.
 
-### After completing the whole lesson
+**Expected behavior in code:** identity resize; 1-by-1 expansion; 2→4 and 4→2 labeled rows; unequal aspect ratios; padded source/output; zero dimensions rejected; no source writes. Confirm index mapping numerically before relying on a displayed image.
 
-**Checks:** identity resize; 1-by-1 expansion; 2→4 and 4→2 labeled rows; unequal aspect ratios; padded source/output; zero dimensions rejected; no source writes. Confirm index mapping numerically before relying on a displayed image.
-
-**Questions:** Why map pixel centers? Why can nearest neighbor alias when shrinking? Why use wide intermediates despite small channel values? Which calculations are constant across an output row?
-
-**Completion rubric:** documented coordinate convention, exact mapping, checked positive dimensions, and independent strides. Commit: `M08-L02: resize with nearest-neighbor sampling`.
+**Implementation scope:** documented coordinate convention, exact mapping, checked positive dimensions, and independent strides. Commit: `M08-L02: resize with nearest-neighbor sampling`.
 
 ## M08-L03 — Scalar bilinear interpolation
 
@@ -111,13 +103,9 @@ Each horizontal destination row has `4*destinationWidth` Float elements. Source 
 
 Tutors provide and explain table-generation/ownership scaffolding. Keep alpha at 255 for this opaque-only path. This decomposition prepares the same pipeline for NEON next lesson.
 
-### After completing the whole lesson
+**Expected behavior in code:** worked midpoint=139; constant and identity images; 1-pixel axes; corners under clamping; horizontal/vertical gradients; finite coordinates and weights in [0,1]; tolerance comparison with an independent Double reference.
 
-**Checks:** worked midpoint=139; constant and identity images; 1-pixel axes; corners under clamping; horizontal/vertical gradients; finite coordinates and weights in [0,1]; tolerance comparison with an independent Double reference.
-
-**Questions:** Why clamp before choosing neighbors and fractions? Why round only at final output? What changes with fused arithmetic? Why is bilinear shrinking not a complete high-quality antialiasing filter?
-
-**Completion rubric:** explicit coordinates/borders, Float intermediate rows, numerical tolerance evidence, exact identity, and honest quality scope. Commit: `M08-L03: add scalar bilinear resizing`.
+**Implementation scope:** explicit coordinates/borders, Float intermediate rows, numerical tolerance evidence, exact identity, and honest quality scope. Commit: `M08-L03: add scalar bilinear resizing`.
 
 ## M08-L04 — Vectorize the contiguous interpolation pass
 
@@ -143,13 +131,9 @@ Implement a NEON vertical row kernel using a C header interface with destination
 
 Compare a fused `fmla` variant only as an explicit experiment with the same stated error bound. Do not enable broad fast-math behavior merely to chase speed; numerical changes need evidence.
 
-### After completing the whole lesson
+**Expected behavior in code:** scalar schedule agreement; analytical tolerance; full RGBA pixel store bounds; odd widths; alpha stays 255; no temporary row overreads. Include alternating extreme samples and ty values 0,0.5,1.
 
-**Checks:** scalar schedule agreement; analytical tolerance; full RGBA pixel store bounds; odd widths; alpha stays 255; no temporary row overreads. Include alternating extreme samples and ty values 0,0.5,1.
-
-**Questions:** Why is vertical interpolation more contiguous? How many pixels are in a Float vector here? Why can a 16-byte store after narrowing corrupt output? How does fused arithmetic alter rounding?
-
-**Completion rubric:** useful NEON pass, correct Float/byte layout transition, scoped temporary buffers, and numerical evidence. Commit: `M08-L04: vectorize bilinear vertical interpolation`.
+**Implementation scope:** useful NEON pass, correct Float/byte layout transition, scoped temporary buffers, and numerical evidence. Commit: `M08-L04: vectorize bilinear vertical interpolation`.
 
 ## M08-L05 — An explicit linear-light path
 
@@ -179,13 +163,9 @@ Create a 256-entry Float decoding table in Swift and a scalar reference encoder 
 
 State absolute tolerance 0.000001 for Float blend results in [0,1] against the Double calculation, and at most one encoded code value where Float rounding crosses a threshold. Keep the endpoint and constant-image invariants.
 
-### After completing the whole lesson
+**Expected behavior in code:** transfer endpoints 0/1; all 256 byte values round-trip through the Double helpers; black/white blend approximately 188 versus encoded 128; scalar/NEON Float results within tolerance; alpha unchanged/opaque; options produce documented different outputs.
 
-**Checks:** transfer endpoints 0/1; all 256 byte values round-trip through the Double helpers; black/white blend approximately 188 versus encoded 128; scalar/NEON Float results within tolerance; alpha unchanged/opaque; options produce documented different outputs.
-
-**Questions:** Why is gamma-space averaging darker? Why is alpha excluded from the color transfer? Why keep old encoded tests? Which work is intentionally handled by Swift rather than assembly?
-
-**Completion rubric:** explicit color-space choice, correct transfer functions, meaningful visual/numerical comparison, and retained contracts. Commit: `M08-L05: add linear-light image processing`.
+**Implementation scope:** explicit color-space choice, correct transfer functions, meaningful visual/numerical comparison, and retained contracts. Commit: `M08-L05: add linear-light image processing`.
 
 ## Module references
 

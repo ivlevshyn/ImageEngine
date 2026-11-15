@@ -1,6 +1,6 @@
 # Module 10 — An integrated image-processing engine
 
-Prerequisite: Module 09. This module combines existing algorithms with supplied/explained Swift systems scaffolding. It does not require designing a GUI or a threading runtime. Whole-lesson checks and questions remain at the end.
+Prerequisite: Module 09. This module combines existing algorithms with supplied/explained Swift systems scaffolding. It does not require designing a GUI or a threading runtime. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M10-L01 — Plan and execute an image pipeline
 
@@ -28,13 +28,9 @@ Create a plan describing dimensions, representation, input/output aliasing, scra
 
 Support a small explicit CLI pipeline syntax documented by you, such as separate operation arguments parsed in Swift. Parsing is supplied scaffolding if needed. Keep a `--implementation scalar|neon` comparison mode; unsupported NEON stages may use a clearly reported scalar fallback. Reject incompatible parameters/representations before processing.
 
-### After completing the whole lesson
+**Expected behavior in code:** empty pipeline is identity; a mixed sequence matches direct stage-by-stage execution; dimension changes update later strides/capacities; unsupported alpha/representation combinations reject; repeated executions do not retain stale data or pointers.
 
-**Checks:** empty pipeline is identity; a mixed sequence matches direct stage-by-stage execution; dimension changes update later strides/capacities; unsupported alpha/representation combinations reject; repeated executions do not retain stale data or pointers.
-
-**Questions:** Why describe aliasing in the plan? When can scratch storage be reused? Why does operation order remain part of the contract? How should a missing optimized implementation be reported?
-
-**Completion rubric:** explicit plan, correct execution, bounded reusable storage, truthful fallback selection, and reproducible CLI examples. Commit: `M10-L01: integrate image pipelines`.
+**Implementation scope:** explicit plan, correct execution, bounded reusable storage, truthful fallback selection, and reproducible CLI examples. Commit: `M10-L01: integrate image pipelines`.
 
 ## M10-L02 — Tiles and neighborhood halos
 
@@ -52,13 +48,9 @@ Introduce a tile descriptor with integer origin and size, all validated against 
 
 Test tile sizes 1,3,8,31 and dimensions not divisible by them. Keep global strides when pointing into the original allocation. A tile's base pointer does not make its rows tightly packed. Use the untiled scalar and NEON versions as oracles.
 
-### After completing the whole lesson
+**Expected behavior in code:** exact tiled/untiled equality; corner/edge tiles; a bright line crossing tile boundaries; partial last tiles; no duplicate or missing output pixels; sentinel/padding preservation. Show one halo calculation by hand.
 
-**Checks:** exact tiled/untiled equality; corner/edge tiles; a bright line crossing tile boundaries; partial last tiles; no duplicate or missing output pixels; sentinel/padding preservation. Show one halo calculation by hand.
-
-**Questions:** Why are tile boundaries not image boundaries? Why does a view retain the parent stride? How do halos differ from owned output? How would two blur stages change required source coverage?
-
-**Completion rubric:** correct coordinate model, halo semantics, complete nonoverlapping writes, and seam-free exact output. Commit: `M10-L02: tile pointwise and neighborhood operations`.
+**Implementation scope:** correct coordinate model, halo semantics, complete nonoverlapping writes, and seam-free exact output. Commit: `M10-L02: tile pointwise and neighborhood operations`.
 
 ## M10-L03 — Schedule independent tiles safely
 
@@ -91,13 +83,9 @@ This class does not create safety. The unchecked annotation makes your proof obl
 
 Parallelize tiled inversion, then blur with private per-job scratch. Use a bounded number of worker jobs that each process several tiles, rather than creating an unbounded worker abstraction. Keep a serial fallback for small workloads. Allocation of job scratch occurs before timing or is included explicitly as wrapper cost. Do not request core pinning or assume core types.
 
-### After completing the whole lesson
+**Expected behavior in code:** exact serial/parallel results across job counts 1,2,3,4 and tile sizes; repeated runs; write-region proof; no retained pointers; all jobs complete before borrowed storage is released; compiler concurrency diagnostics addressed narrowly. Measure crossover and regressions.
 
-**Checks:** exact serial/parallel results across job counts 1,2,3,4 and tile sizes; repeated runs; write-region proof; no retained pointers; all jobs complete before borrowed storage is released; compiler concurrency diagnostics addressed narrowly. Measure crossover and regressions.
-
-**Questions:** Why must the parallel loop be synchronous here? What does `@unchecked Sendable` assert rather than prove? Why does shared scratch create a race? Why can correct disjoint writes still suffer false sharing or bandwidth limits?
-
-**Completion rubric:** explicit ownership/lifetime proof, private scratch, exact output, bounded scheduling, and measured serial fallback rationale. Commit: `M10-L03: schedule independent image tiles`.
+**Implementation scope:** explicit ownership/lifetime proof, private scratch, exact output, bounded scheduling, and measured serial fallback rationale. Commit: `M10-L03: schedule independent image tiles`.
 
 ## M10-L04 — PNG input/output with a normalized boundary
 
@@ -115,13 +103,9 @@ For the first required PNG path, accept **opaque images** and normalize to 8-bit
 
 Integrate the supplied adapter with your existing CLI and pipeline. Read dimensions before allocating the working image, apply the same size policy, and reject unsupported multi-image/orientation behavior explicitly or normalize it deliberately. Use a four-corner test to establish row orientation; do not assume a drawing coordinate convention maps to your byte-row convention without evidence. On output, construct a CGImage describing the exact owned buffer and keep it alive for the encoder's use. Check destination finalization success.
 
-### After completing the whole lesson
+**Expected behavior in code:** red/green/blue/white pixels keep channel order; asymmetric corners preserve orientation; opaque sRGB PNG round-trip preserves selected pixel samples; transparent input rejects clearly; profile conversion is reported as conversion rather than asserted byte identity; invalid dimensions/files fail. Run a complete PNG→pipeline→PNG example.
 
-**Checks:** red/green/blue/white pixels keep channel order; asymmetric corners preserve orientation; opaque sRGB PNG round-trip preserves selected pixel samples; transparent input rejects clearly; profile conversion is reported as conversion rather than asserted byte identity; invalid dimensions/files fail. Run a complete PNG→pipeline→PNG example.
-
-**Questions:** Why is '32-bit pixels' insufficient to specify a layout? When do straight and premultiplied RGB coincide? Why can profile conversion change samples? What keeps output storage alive during encoding?
-
-**Completion rubric:** supplied/explained adapter integrated correctly, verified RGBA/orientation/sRGB boundary, honest opaque scope, error handling, and end-to-end evidence. Commit: `M10-L04: add normalized PNG input and output`.
+**Implementation scope:** supplied/explained adapter integrated correctly, verified RGBA/orientation/sRGB boundary, honest opaque scope, error handling, and end-to-end evidence. Commit: `M10-L04: add normalized PNG input and output`.
 
 ## M10-L05 — Release and explain the engine
 
@@ -139,15 +123,11 @@ Prepare one demonstration pipeline using at least a pointwise operation, a neigh
 
 Write a short optimization report with a table of changes, hypotheses, measurements, numerical equivalence, and adoption decisions. Include at least one experiment that failed to improve performance or had a workload-specific tradeoff. Explain the result honestly. Add known limitations such as opaque-only filters/PNG boundary, simplified PPM subset, bilinear downsampling quality, and absence of native automated evidence where applicable.
 
-The lesson does not require making a repository public, publishing a release, or pushing a tag automatically. You decide whether to tag the reviewed commit. A local/repository release candidate is sufficient.
+The lesson does not require making a repository public, publishing a release, or pushing a tag automatically. You decide whether to tag the checked commit. A local/repository release candidate is sufficient.
 
-### After completing the whole lesson
+**Expected behavior in code:** a clean checkout builds from documented commands; all required checks pass; no hidden generated dependency is needed; examples produce specified outputs; reported performance is reproducible within normal variation; all concrete code defects identified earlier are resolved.
 
-**Checks:** a clean checkout builds from documented commands; all required checks pass; no hidden generated dependency is needed; examples produce specified outputs; reported performance is reproducible within normal variation; all earlier required review fixes are resolved.
-
-**Questions:** How does data move from a file to vector registers and back? Which safety obligations remain despite Swift ownership? Where did SIMD help most, and where did memory or scheduling dominate? How would you investigate a new incorrect image without guessing?
-
-**Completion rubric:** complete reproducible engine, documented contracts/limits, traceable correctness and performance evidence, and an explanation connecting memory, ABI, SIMD, and architecture. Commit: `M10-L05: document and validate the image engine release`.
+**Implementation scope:** complete reproducible engine, documented contracts/limits, traceable correctness and performance evidence, and an explanation connecting memory, ABI, SIMD, and architecture. Commit: `M10-L05: document and validate the image engine release`.
 
 ## Module references
 

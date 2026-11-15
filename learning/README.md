@@ -9,11 +9,11 @@ Everything in this package belongs in your repository's `learning/` directory. Y
 1. Extract the ZIP at your repository root. It contains one top-level `learning/` directory.
 2. Read [the course guide](course-guide.md), then begin **M01-L01**.
 3. Give ChatGPT the repository URL and the teaching prompt below. An accessible checkout or uploaded repository ZIP also works.
-4. Work through the lesson one step per message, asking the tutor to continue when ready. Follow the implementation tasks as they are introduced, then perform the checks and answer the questions in the final step.
-5. Commit and push the lesson. Request a whole-lesson review using an exact commit hash.
-6. Resolve required fixes, then record the reviewed implementation commit in [progress](progress.md).
+4. Work through the lesson one step per message, asking the tutor to continue when ready. Finish with the implementation tasks; there is no final checks/review step or quiz.
+5. Commit and push the lesson. The tutor checks the code directly in the GitHub repository at that revision.
+6. Resolve any concrete code defects, then record the checked implementation commit and completion in [progress](progress.md). No answers, logs, screenshots, debugger traces, or other evidence submissions are required.
 
-One lesson spans several teaching messages and remains one review unit. Pause between steps and ask to continue when ready. Steps do not require separate commits, quizzes, verification reports, or review approval. Aim for 1–2 hours per lesson, but take longer when debugging or learning unfamiliar mathematics. Nothing is timed. Ask for help whenever you want.
+One lesson spans several teaching messages. Pause between steps and ask to continue when ready. Steps do not require separate commits, quizzes, verification reports, or review approval. Aim for 1–2 hours per lesson, but take longer when debugging or learning unfamiliar mathematics. Nothing is timed. Ask for help whenever you want.
 
 ## Teaching prompt
 
@@ -34,29 +34,28 @@ guidance specified by the lesson, covering all requirements across the steps.
 Pause after each nonfinal step and wait for me to ask to continue. Answer any
 questions I raise before moving on. Do not add intermediate quizzes, comprehension
 questions, checkpoint approvals, or required verification reports.
-Put all checks and understanding questions in the final step, after the full
-lesson's teaching and implementation tasks.
+End after the teaching and implementation tasks. Do not add end-of-lesson
+checks, reviews, quizzes, or understanding questions. Check committed code in
+GitHub; do not require submitted answers, logs, screenshots, traces, or evidence.
 Do not implement or commit the project for me. If you cannot access required
 files, say exactly what is missing rather than guessing their contents.
 ```
 
-## Whole-lesson review prompt
+## Repository code-check prompt
 
 ```text
-Repository: <URL or attached checkout>
-Completed lesson: <Mxx-Lyy>
-Implementation commit: <full hash>
-Previous reviewed implementation commit: <hash or none>
-My end-of-lesson answers and local command output: <paste or paths>
+Repository: <GitHub URL>
+Lesson: <Mxx-Lyy>
+Implementation revision: <branch or commit>
 
-Read learning/AGENTS.md and review the ENTIRE lesson against its requirements.
-Inspect the complete relevant implementation at the stated commit, not just
-the latest diff. Report requirement-by-requirement evidence, required fixes,
-optional improvements, and anything you could not verify. Separate executed
-tests from code inspection and my supplied output. Do not claim to have run
-macOS ARM64 code unless you actually did. Ask understanding questions only now,
-after the full lesson. Propose a learning/progress.md update; do not modify my
-implementation unless I explicitly ask.
+Read learning/AGENTS.md and inspect the relevant committed source, declarations,
+callers, and repository tests for this lesson. Give brief feedback on concrete
+code defects and any required fixes, keeping optional improvements separate.
+Use code in GitHub; do not request answers, logs, screenshots, debugger traces,
+or other evidence, and do not add a formal end-of-lesson review or quiz.
+Distinguish code inspection from tests actually executed. Record the checked
+implementation revision and lesson status in learning/progress.md when asked.
+Do not modify my implementation unless I explicitly ask.
 ```
 
 ## Course map
@@ -83,7 +82,7 @@ These are reminders and bridges to official documentation, not substitute instru
 - [LLDB and common failures](reference/debugging.md)
 - [NEON concepts and instruction families](reference/neon.md)
 - [Pixel mathematics and numerical contracts](reference/image-math.md)
-- [Testing, evidence, and benchmarking](reference/testing-and-performance.md)
+- [Testing and benchmarking](reference/testing-and-performance.md)
 - [Official online resources](reference/resources.md)
 
 ## Reproducibility and validation

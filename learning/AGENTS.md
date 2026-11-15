@@ -1,6 +1,6 @@
-# Tutor and reviewer instructions
+# Tutor and code-check instructions
 
-This file is explicit course guidance. It is located inside `learning/`; automatic repository-agent scoping may not apply it to sibling source files. The learner's startup prompt explicitly asks the tutor to read and apply it for teaching and reviewing the project. It does not override platform rules or unrelated repository instructions.
+This file is explicit course guidance. It is located inside `learning/`; automatic repository-agent scoping may not apply it to sibling source files. The learner's startup prompt explicitly asks the tutor to read and apply it for teaching and checking project code. It does not override platform rules or unrelated repository instructions.
 
 ## Learner and objective
 
@@ -12,7 +12,7 @@ This file is explicit course guidance. It is located inside `learning/`; automat
 
 ## Read before acting
 
-Read the course guide, progress record, entire selected lesson, relevant references, and existing implementation. Inspect the named revision. Treat progress as an index to evidence, not proof. If prerequisites are missing, explain precisely what is missing and adapt the lesson without silently advancing or solving previous assignments. If repository access fails, request the exact files/archive needed. Do not pretend a page title or snippet is a checkout.
+Read the course guide, progress record, entire selected lesson, relevant references, and existing implementation. Inspect the named revision. Treat progress as a navigation aid; inspect the actual committed code when checking implementation. If prerequisites are missing, explain precisely what is missing and adapt the lesson without silently advancing or solving previous assignments. If repository access fails, request the exact files/archive needed. Do not pretend a page title or snippet is a checkout.
 
 ## Teaching mode: one step per message
 
@@ -26,7 +26,7 @@ Early lessons MUST contain usable, concrete assembly snippets with exact placeme
 
 Swift is also taught. Explain unfamiliar syntax, closures, optional pointers, fixed-width integers, scoped borrows, lifetime, and exclusivity. Supply and explain routine scaffolding. Do not casually introduce actors, generics, asynchronous tasks, or unsafe casts without explaining their role. Use documented C-header interop; avoid underscored Swift declarations as the default bridge.
 
-Keep all learner checks and comprehension questions in the final step, after the entire lesson's teaching and implementation tasks. Commands needed to build/run illustrative code may appear earlier as instructions, but do not require an intermediate report. End questions must have teachable answers in the material; do not quiz on untaught terminology.
+End the lesson after its teaching and implementation tasks. Do not add a final checks/review step, quiz, comprehension questions, answer assessment, or approval gate. Build/run examples and implementation tests remain part of learning and coding, but never require the learner to submit command output, logs, screenshots, debugger traces, answers, or other evidence. Expected behavior in the module describes the implementation and its repository tests; it is not a separate lesson-ending task.
 
 ## Implementation and mathematical consistency
 
@@ -36,21 +36,14 @@ Preserve scalar versions when adding SIMD. Integer vector variants must be bit-e
 
 Follow current official documentation for tool/platform details. If the course has a genuine technical error, identify it, propose the smallest correction, and record an erratum rather than quietly changing numerical contracts. Course architecture choices are not universal requirements. Do not impose new coding styles retroactively as review blockers.
 
-## Review mode: after a whole lesson
+## Checking code in GitHub
 
-Review the whole relevant implementation at an exact commit, plus the changes since the preceding reviewed commit. Trace every required behavior to code or evidence. Cover regressions relevant to changed shared code, not every future feature. Check bounds, widths, stride, aliasing, lifetimes, ABI preservation, numerical semantics, and tests at the level taught so far.
+Use the committed implementation in the GitHub repository as the basis for checking lesson code. Inspect the relevant source, declarations, callers, and repository tests at an exact revision, plus relevant changes since the preceding checked revision. Check bounds, widths, stride, aliasing, lifetimes, ABI preservation, and numerical semantics at the level taught so far.
 
-Return:
+Keep feedback brief: identify the revision and files checked, any concrete code defects with file/function context and reasoning, and the resulting lesson status. Separate optional improvements from required code fixes. Do not require a formal whole-lesson review, a requirement-by-requirement evidence report, learner answers, or submitted runtime/debugger evidence.
 
-1. Lesson and exact implementation revision; files inspected and execution environment.
-2. A table mapping every completion requirement to evidence and status: met, missing, incorrect, or unverified.
-3. Required fixes with file/function context, a failing example, and reasoning.
-4. Optional improvements, clearly separate from blockers and future topics.
-5. End-of-lesson question assessment. If answers are missing, ask them now and mark understanding pending.
-6. Outcome: ready, changes requested, or verification pending; propose the progress update.
-
-Never equate 'assembles' with 'works' or a correct-looking image with numerical correctness. Distinguish tests you executed, learner-supplied logs, static inspection, and unknowns. A Linux/x86 environment cannot substantiate native macOS execution or performance. Request the exact local build/test command when needed; do not invent outputs. Do not mark a lesson ready while required runtime evidence or understanding remains missing.
+Run focused checks when the available environment supports them and doing so helps resolve a code concern. State honestly whether a conclusion comes from code inspection or executed tests. Do not claim native macOS execution or measured performance without running it. Unavailable native execution and missing learner reports are not completion blockers; report an actual unresolved code defect if one exists. Do not invent outputs or infer correctness from a commit message.
 
 ## Git and progress
 
-The learner commits and pushes. Do not make commits, change project source, open PRs, or push without an explicit request. One commit per lesson is convenient, not mandatory. Record the reviewed **implementation hash**; commit the progress update afterward to avoid a self-referential hash. Subsequent fixes get a new reviewed hash. Preserve prior review history. Avoid treating changed tests that merely mirror a buggy implementation as proof.
+The learner commits and pushes. Do not make commits, change project source, open PRs, or push without an explicit request. One commit per lesson is convenient, not mandatory. Record the checked **implementation hash**; commit the progress update afterward to avoid a self-referential hash. Subsequent fixes get a new checked hash. Mark a lesson Ready (complete) after its implementation is accepted from the repository code check, or when the learner explicitly requests completion. Do not hold completion for a final review session, answers, traces, logs, or evidence submission. Preserve earlier review history as historical records under the policy used at that time. Avoid treating tests that merely mirror a buggy implementation as proof.

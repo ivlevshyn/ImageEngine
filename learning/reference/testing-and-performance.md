@@ -1,6 +1,6 @@
-# Testing, review evidence, and performance
+# Testing and performance
 
-Use these reminders after the lesson's implementation. They do not create intermediate lesson gates.
+Use these reminders while implementing code and repository tests. They do not create end-of-lesson checks/reviews or require evidence submissions.
 
 ## Correctness evidence ladder
 
@@ -32,37 +32,13 @@ Report operation, implementation variant, seed, width/height/stride, parameter v
 
 Sentinels tell you whether bytes were changed. They do not tell you whether a vector read beyond the active region and discarded some lanes. Review the largest load/store extent. The final address plus access width must remain within the permitted region. For neighborhood algorithms include the halo, not only the destination tile.
 
-## Review report template
+## Repository code checks
 
-```text
-Lesson:
-Implementation commit:
-Previous reviewed commit:
-Files inspected:
-Execution environment:
+Inspect the relevant committed implementation, declarations, callers, and tests at an exact GitHub revision. Report concrete defects and required fixes briefly, keeping optional improvements separate. Record the checked revision and lesson status when updating progress.
 
-Requirement | Evidence | Status
-...
+Do not require a formal end-of-lesson review, question answers, command output, screenshots, debugger traces, or other learner evidence. Use repository code as the basis for completion. Run focused checks when useful and supported by the available environment, and distinguish executed tests from static conclusions. Missing native execution alone is not a completion blocker; do not claim execution or performance that was not measured.
 
-Required fixes:
-- File/function, input exposing the issue, expected behavior, explanation.
-
-Optional improvements:
-- Clearly distinguish later-course topics.
-
-Questions:
-- Answer assessment or questions still pending.
-
-Executed here:
-Learner-provided outputs:
-Static-only conclusions:
-Unverified items:
-
-Outcome: ready / changes requested / verification pending
-Proposed progress entry:
-```
-
-Do not mark a lesson ready if its necessary native checks were neither executed nor supplied as credible local evidence. Treat user-provided logs as such; they are not tests the reviewer ran. Changes to shared helpers require focused regression coverage, not an unbounded demand to redo all future lessons.
+Changes to shared helpers call for focused regression coverage in the implementation, rather than an unbounded demand to redo future lessons. Benchmark data is useful project material when that is the implementation task; it is not a separate evidence submission or review gate.
 
 ## Benchmark units
 

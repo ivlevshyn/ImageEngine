@@ -1,35 +1,36 @@
-# Progress and review record
+# Progress and code-check record
 
-This file records evidence; it does not replace reading the actual implementation.
+This file tracks lesson completion and checked implementation revisions; inspect the actual repository code. Current policy: no end-of-lesson checks/reviews, quizzes, or evidence submissions. Earlier review records below retain the policy and findings from their dates.
 
 ## Current position
 
-- Current lesson: **M02-L01 — Read and write through a pointer**.
-- Next lesson: **M02-L01 final checks/review**; M02-L02 follows after completion.
+- Current lesson: **M02-L02 — Fill a row with a loop** (not started).
+- Last completed lesson: **M02-L01 — Read and write through a pointer**.
+- Next lesson: **M02-L02 — Fill a row with a loop**.
 - Current implementation revision: f01291a9ce85281943b4204289dd34322fc956cb
-- Last reviewed implementation revision: f01291a9ce85281943b4204289dd34322fc956cb (changes requested; not yet Ready).
-- Last Ready implementation revision: 85a0040f242a01d79c9b1a3890da29da2c2586fe (M01-L05).
+- Last checked implementation revision: f01291a9ce85281943b4204289dd34322fc956cb (M02-L01 complete at the learner's explicit request under the updated policy).
+- Last Ready implementation revision: f01291a9ce85281943b4204289dd34322fc956cb (M02-L01).
 - Toolchain/SDK record: reviewer verified native arm64 execution on macOS 27.2.1 (build 26B131), Apple Swift 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1), Apple Clang 21.0.0 (clang-2100.4.1.1), and the macOS 27.2 SDK on 2026-11-15. Developer directory: /Applications/Xcode.app/Contents/Developer. M02-L01 was built with direct xcrun compiler commands in debug mode.
-- Required fixes still open: document the four-writable-byte precondition beside invert_pixel in ImageEngine/Pixel.h. Completion evidence still pending: byte-oriented LLDB trace and all four end-of-lesson answers.
+- Required work for progression: none. M02-L01 is complete at the learner's explicit request. The earlier invert_pixel declaration-comment finding is retained below as a nonblocking documentation follow-up; no LLDB trace or final answers are required.
 - Current source layout: ImageEngine/Pixel.s, ImageEngine/Pixel.h, and ImageEngine/main.swift, built through ImageEngine.xcodeproj. Earlier review entries retain their historical src/ paths.
-- Revision note: f01291a9ce85281943b4204289dd34322fc956cb is the exact inspected and executed source snapshot. This progress-only commit follows it and does not change implementation source.
+- Revision note: f01291a9ce85281943b4204289dd34322fc956cb is the implementation snapshot from the earlier review. The teaching-policy/completion update changes course documentation only and does not claim a new native execution.
 
 ## Status definitions
 
-Use **Not started**, **In progress**, **Submitted**, **Changes requested**, **Verification pending**, or **Ready**. Ready means required implementation, evidence, and end-of-lesson understanding have been reviewed. A finished coding attempt with unanswered questions is not yet Ready.
+Use **Not started**, **In progress**, **Changes requested**, or **Ready**. Ready means complete based on checking the committed code in GitHub, or an explicit learner completion request. Final questions, formal lesson reviews, and submitted runtime/debugger evidence are not required. Historical Submitted and Verification pending statuses may appear in earlier records.
 
-Record the exact implementation commit being reviewed. Commit this progress update afterward, so the recorded hash is not self-referential. A later fix requires its own reviewed hash. Keep prior reviews in the history section rather than erasing them.
+Record the exact implementation commit checked. Commit the progress update afterward, so the recorded hash is not self-referential. A later code fix gets its own checked hash. Preserve prior reviews as history, rather than treating their superseded evidence/answer requirements as current blockers.
 
 ## Lesson ledger
 
-| Lesson | Status | Reviewed implementation commit | Evidence / answers | Remaining work |
+| Lesson | Status | Checked implementation commit | Code-check / completion notes | Remaining work |
 | --- | --- | --- | --- | --- |
 | M01-L01 | Ready | 35456db2377fa2afe814cfae2310a9e5972cf8bb | Full source/diff reviewed; learner confirmed expected output, clean build, and environment; answers reviewed with corrections explained. | None. |
 | M01-L02 | Ready | c1dd575eb643899fbfc867363d3eb9aea022f160 | Full source/diff reviewed; learner confirmed program execution and all checks; answers assessed with ABI and unsigned-wrap clarifications. Completion accepted at learner's explicit request; documentation/trace exceptions recorded below. | None required for progression. |
 | M01-L03 | Ready | c97016d38061bc482a4e3931e4f5bf082700f2a1 | Corrected Swift diagnostic and header contracts inspected; native arm64 Xcode Debug build and all existing checks passed. Prior question assessment retained, with corrections already explained. | None. Next: M01-L04. |
 | M01-L04 | Ready | fc725ed9bef85083346290ecebe5877ca89544a2 | Complete implementation and diff reviewed; exact committed runner built and executed on native arm64 macOS; 10 supplementary lesson checks passed. All four answers assessed; corrections to Q3 and Q4 explained. | None. Next: M01-L05. |
 | M01-L05 | Ready | 85a0040f242a01d79c9b1a3890da29da2c2586fe | Current source and intervening diff inspected; learner confirmed following the guided LLDB session and everything working as expected. All four answers assessed, with LR naming and final W/X result corrections explained. Unsubmitted trace/note exception recorded below. | None required for progression. Next: M02-L01. |
-| M02-L01 | Changes requested | f01291a9ce85281943b4204289dd34322fc956cb | Complete source and intervening diff reviewed; exact committed runner built and executed on native arm64 macOS; 3 supplementary lesson checks and 768 value/boundary checks passed. | Document invert_pixel's four-byte precondition; supply LLDB byte trace and final answers. |
+| M02-L01 | Ready | f01291a9ce85281943b4204289dd34322fc956cb | Complete at the learner's explicit request on 2026-11-15 under the repository-code policy. Earlier source inspection and native test results remain in history; no new execution claimed. | None required for progression. Optional follow-up: document invert_pixel's four-byte precondition. Next: M02-L02. |
 | M02-L02 | Not started | — | — | — |
 | M02-L03 | Not started | — | — | — |
 | M02-L04 | Not started | — | — | — |
@@ -75,24 +76,13 @@ Record the exact implementation commit being reviewed. Commit this progress upda
 | M10-L04 | Not started | — | — | — |
 | M10-L05 | Not started | — | — | — |
 
-## Review history
+## Code-check and completion history
 
-Append one entry after each whole-lesson review:
+For future entries, record the date, lesson, checked implementation commit, files inspected, concrete code findings, status, and next lesson. State whether tests were actually executed when relevant; no learner evidence or question answers are required.
 
-```text
-Date:
-Lesson:
-Implementation commit:
-Previous reviewed implementation commit:
-Reviewer environment:
-Outcome:
-Required fixes:
-Evidence executed by reviewer:
-Evidence supplied by learner:
-Static-only / unverified items:
-Understanding questions:
-Next action:
-```
+## Historical reviews
+
+The entries below preserve earlier findings and the review policy in effect at that time. The completion update after those entries supersedes outstanding requests for final answers, traces, evidence, and a formal review.
 
 ## M01-L01 review — 2026-10-04
 
@@ -302,6 +292,16 @@ The supplementary runner initially needed -parse-as-library for its @main entry 
 
 This update records the review honestly, preserves prior history, and changes only learning/progress.md.
 
+## M02-L01 completion and teaching-policy update — 2026-11-15
+
+- Outcome: **Ready (complete)** at the learner's explicit request.
+- Implementation commit: f01291a9ce85281943b4204289dd34322fc956cb. Current repository source was inspected at ee300cd4a9477eed6505e92163cecb1cd4d00db6: ImageEngine/Pixel.s, ImageEngine/Pixel.h, and ImageEngine/main.swift.
+- Code inspection: inversion loads/stores RGB bytes at offsets 0–2, leaving alpha untouched; the alpha setter writes offset 3; Swift supplies four UInt8 values and uses each pointer only inside a synchronous mutable borrow.
+- Historical documentation finding: the four-writable-byte contract is missing beside invert_pixel's declaration. This remains a nonblocking documentation follow-up; completion is accepted as requested, without claiming the comment was added.
+- Current policy: check code directly in GitHub. No final checks/review step, quiz, answers, command output, logs, screenshots, debugger traces, or evidence submissions are required.
+- This update performs code inspection only. Earlier native test results remain historical records; no new build, execution, or debugger trace is claimed.
+- Next action: begin **M02-L02 — Fill a row with a loop**.
+
 ## How to resume
 
-Read the next lesson plus its prerequisites and inspect the actual repository revision. If code and this ledger disagree, resolve the discrepancy from evidence. Do not infer completion from a commit message alone. Relevant lesson answers may be kept under `learning/answers/` by the learner or supplied in the review conversation.
+Read M02-L02, its prerequisites, the current teaching guidance, and the actual repository source. Use committed code to resolve implementation discrepancies. Do not revive historical final-review, answer, trace, or evidence-submission requirements.

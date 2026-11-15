@@ -1,6 +1,6 @@
 # Module 04 — Scalar color processing
 
-Prerequisite: Module 03. These functions establish numerical references for SIMD. Keep integer formulas exact and document alpha behavior. All final verification and questions occur after implementation.
+Prerequisite: Module 03. These functions establish numerical references for SIMD. Keep integer formulas exact and document alpha behavior. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M04-L01 — Brightness, signed values, and clamping
 
@@ -32,13 +32,9 @@ _brighten_channel:
 
 Create `brightness_rgba_scalar(data,width,height,stride,delta)`, with uint64 dimensions and int32 delta. The Swift wrapper rejects delta outside the stated interval. Modify only RGB. First use the helper for individual demonstrations; in the image kernel either inline its logic or preserve loop state correctly across calls. Do not introduce per-channel calls without accounting for caller-clobbered registers. Keep the existing inversion implementation unchanged.
 
-### After completing the whole lesson
+**Expected behavior in code:** `(10,-30)->0`, `(250,20)->255`, `(100,20)->120`; delta 0 is identity; -255 makes all RGB black and +255 makes them white; alpha/padding unchanged. Invalid delta fails before assembly.
 
-**Checks:** `(10,-30)->0`, `(250,20)->255`, `(100,20)->120`; delta 0 is identity; -255 makes all RGB black and +255 makes them white; alpha/padding unchanged. Invalid delta fails before assembly.
-
-**Questions:** Why is a byte store insufficient? Why do signed comparison conditions matter? What range must the intermediate represent? Which registers would be unsafe to keep across a helper call?
-
-**Completion rubric:** exact clamp semantics, signed delta, preserved alpha/padding, range validation, and edge cases. Commit: `M04-L01: add scalar brightness`.
+**Implementation scope:** exact clamp semantics, signed delta, preserved alpha/padding, range validation, and edge cases. Commit: `M04-L01: add scalar brightness`.
 
 ## M04-L02 — Weighted grayscale and rounding
 
@@ -67,13 +63,9 @@ lsr w3, w3, #8
 
 Add `grayscale_rgba_scalar(data,width,height,stride)`. Load three channels, apply the formula, write Y into R/G/B, preserve A and padding. Add an independent Swift formula using Int or UInt32 intermediates for hand-sized fixtures. Explain the Swift conversions before arithmetic; multiplying UInt8 values directly can overflow before assignment to a wider variable.
 
-### After completing the whole lesson
+**Expected behavior in code:** pure red maps to 77, green to 149, blue to 29, black to 0, white to 255; gray input `(c,c,c)` stays c for every c in 0…255. Check nonopaque alpha is preserved. Confirm the green result by calculation, not by assuming it equals the weight.
 
-**Checks:** pure red maps to 77, green to 149, blue to 29, black to 0, white to 255; gray input `(c,c,c)` stays c for every c in 0…255. Check nonopaque alpha is preserved. Confirm the green result by calculation, not by assuming it equals the weight.
-
-**Questions:** Why add 128? Why do weights sum to 256? Why widen before multiplication? Why is encoded grayscale different from linear-light luminance?
-
-**Completion rubric:** exact formula, independent expected values, full intermediate-range proof, and unchanged alpha/padding. Commit: `M04-L02: add weighted scalar grayscale`.
+**Implementation scope:** exact formula, independent expected values, full intermediate-range proof, and unchanged alpha/padding. Commit: `M04-L02: add weighted scalar grayscale`.
 
 ## M04-L03 — Contrast in fixed-point arithmetic
 
@@ -103,13 +95,9 @@ The product lies between -131,072 and 130,048; a signed 32-bit intermediate easi
 
 Add `contrast_rgba_scalar(data,width,height,stride,factorQ8)` with uint32 factor, validated by Swift. Preserve alpha. Add a CLI argument that accepts integer Q8 values initially; user-friendly decimal conversion can remain a Swift-side extension. Keep integer numerical semantics visible in tests.
 
-### After completing the whole lesson
+**Expected behavior in code:** factor 0 gives 128; 256 is identity; 512 maps 0→0, 64→0, 128→128, 192→255, 255→255. Test factors 128 and 1024 and channels around 127/128. Reject 1025.
 
-**Checks:** factor 0 gives 128; 256 is identity; 512 maps 0→0, 64→0, 128→128, 192→255, 255→255. Test factors 128 and 1024 and channels around 127/128. Reject 1025.
-
-**Questions:** Why is the midpoint added in scaled units? What distinguishes `asr` from `lsr`? How does factor quantization differ from rounding the result? Why can a scalar/vector comparison miss a shared formula error?
-
-**Completion rubric:** declared Q8 interpretation, exact signed rounding, bounded factor, independent examples. Commit: `M04-L03: add fixed-point contrast`.
+**Implementation scope:** declared Q8 interpretation, exact signed rounding, bounded factor, independent examples. Commit: `M04-L03: add fixed-point contrast`.
 
 ## M04-L04 — Blend two opaque images
 
@@ -135,13 +123,9 @@ Because the weights sum to 256, the largest sum including rounding is 65,408. Th
 
 Use a row kernel to keep the ABI small: `blend_row_scalar(dst,a,b,pixels,t)` with pointers, uint64 count, uint32 t. A Swift wrapper validates matching dimensions and opaque active alpha, borrows input arrays immutably, and loops over rows into a new image. It passes each row's independently computed address. The tutor supplies and explains nested borrow closures if needed. Keep the loop in Swift for now; the assembly row kernel is the learning target.
 
-### After completing the whole lesson
+**Expected behavior in code:** t=0 and 256 return the respective input; t=128 blends 0 and 255 to 128; equal input images are unchanged; input buffers remain intact; distinct strides work; dimensions/alpha/t errors are rejected. Test 1-pixel and empty cases according to the wrapper contract.
 
-**Checks:** t=0 and 256 return the respective input; t=128 blends 0 and 255 to 128; equal input images are unchanged; input buffers remain intact; distinct strides work; dimensions/alpha/t errors are rejected. Test 1-pixel and empty cases according to the wrapper contract.
-
-**Questions:** Why is t allowed to equal 256? Why not store t in UInt8? Why round only after accumulating? Why are input strides independent even when dimensions match?
-
-**Completion rubric:** exact endpoints/rounding, row API, disjoint output, validated opaque policy, and independent inputs. Commit: `M04-L04: blend two scalar images`.
+**Implementation scope:** exact endpoints/rounding, row API, disjoint output, validated opaque policy, and independent inputs. Commit: `M04-L04: blend two scalar images`.
 
 ## M04-L05 — Alpha compositing with an explicit representation
 
@@ -176,13 +160,9 @@ Add `composite_over_opaque_row_scalar(dst,foreground,background,pixels)` with di
 
 Document that general straight-over-straight composition requires computing output alpha and handling division by it; that extension is not required here. Do not silently accept unsupported background transparency.
 
-### After completing the whole lesson
+**Expected behavior in code:** transparent foreground leaves background; opaque foreground replaces it; the worked 200/20/128 case gives 110; output alpha is 255; nonopaque backgrounds reject; padding/input storage unchanged.
 
-**Checks:** transparent foreground leaves background; opaque foreground replaces it; the worked 200/20/128 case gives 110; output alpha is 255; nonopaque backgrounds reject; padding/input storage unchanged.
-
-**Questions:** Why does premultiplied RGB require a different formula? Why is /255 not /256? Why may a transparent pixel contain nonzero RGB? Why does the current contract avoid dividing by output alpha?
-
-**Completion rubric:** exact formula and representation, validated background, endpoint/midpoint evidence, and honest scope. Commit: `M04-L05: composite straight alpha over opaque images`.
+**Implementation scope:** exact formula and representation, validated background, endpoint/midpoint evidence, and honest scope. Commit: `M04-L05: composite straight alpha over opaque images`.
 
 ## Module references
 

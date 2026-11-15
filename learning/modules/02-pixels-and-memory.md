@@ -1,6 +1,6 @@
 # Module 02 — Pixels in memory
 
-Prerequisite: Module 01. This module still supplies complete small kernels. Swift scaffolding is taught explicitly. All checks and questions belong after the entire lesson's implementation.
+Prerequisite: Module 01. This module still supplies complete small kernels. Swift scaffolding is taught explicitly. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M02-L01 — Read and write through a pointer
 
@@ -48,13 +48,9 @@ print(bytes)
 
 Add the function and driver. Add a second function that changes only the alpha byte to 255. State its four-byte precondition. Preserve earlier value-based functions; they teach a different interface. Use the debugger's byte-oriented memory read to inspect the buffer at entry and after return.
 
-### After completing the whole lesson
+**Expected behavior in code:** inversion produces `[245,235,225,99]`; the alpha setter produces `[245,235,225,255]`; a second inversion restores the original RGB. Use a four-byte buffer, not an empty one, for this single-pixel API.
 
-**Checks:** inversion produces `[245,235,225,99]`; the alpha setter produces `[245,235,225,255]`; a second inversion restores the original RGB. Use a four-byte buffer, not an empty one, for this single-pixel API.
-
-**Questions:** What is in X0: the pixel or its address? Why does `strb` not change the following byte? Why is the pointer valid inside the closure? Why is the single-pixel function not valid for an empty buffer?
-
-**Completion rubric:** correct byte access, alpha policy, scoped borrowing, and a memory trace. Commit: `M02-L01: operate on a pixel buffer`.
+**Implementation scope:** correct byte access, alpha policy, and scoped borrowing; debugger exploration is practice, and saving/submitting a memory trace is optional. Commit: `M02-L01: operate on a pixel buffer`.
 
 ## M02-L02 — Fill a row with a loop
 
@@ -93,13 +89,9 @@ func check(_ condition: Bool, _ message: String) {
 
 This takes a Boolean and message. A failed check stops the process with failure. Unlike a debug-only assertion, this remains an explicit check in our release builds. Group checks in `runChecks()` and call it from `main.swift` when `CommandLine.arguments.contains("--self-test")`. Update the compile command to include `src/swift/*.swift`.
 
-### After completing the whole lesson
+**Expected behavior in code:** count 3 gives three copies of `[10,20,30,255]`. Use a larger array with four marker bytes before and after the active region; pass the pointer advanced by four and verify markers unchanged. For count zero, use a valid marker-buffer pointer and verify no changes; the kernel's early return must also make an empty pointer safe.
 
-**Checks:** count 3 gives three copies of `[10,20,30,255]`. Use a larger array with four marker bytes before and after the active region; pass the pointer advanced by four and verify markers unchanged. For count zero, use a valid marker-buffer pointer and verify no changes; the kernel's early return must also make an empty pointer safe.
-
-**Questions:** Why guard zero before the first store? What does post-indexing change? Why is `subs` needed before `b.ne`? What happens if a byte count is passed as pixels?
-
-**Completion rubric:** correct count units, zero handling, bounded writes, and a release-effective check helper. Commit: `M02-L02: fill bounded pixel rows`.
+**Implementation scope:** correct count units, zero handling, bounded writes, and a release-effective check helper. Commit: `M02-L02: fill bounded pixel rows`.
 
 ## M02-L03 — Process rows with a stride
 
@@ -159,13 +151,9 @@ xcrun swiftc "${swift_flags[@]}" -import-objc-header src/bridge/Pixel.h \
 
 This script stops on errors, compiles each assembly file, and links the resulting objects with all Swift files. Arrays preserve argument boundaries. Run `bash build.sh` and `.build/pixel --self-test`; `bash build.sh release` changes only the Swift optimization mode. Assembly instructions remain the ones you wrote. Keep unique assembly basenames if splitting files later.
 
-### After completing the whole lesson
+**Expected behavior in code:** every active RGB byte is inverted, alpha and row padding unchanged; 0-by-N and N-by-0 return without stores; 1-by-1 and a tightly packed 3-by-2 image work. Build and run checks in both modes.
 
-**Checks:** every active RGB byte is inverted, alpha and row padding unchanged; 0-by-N and N-by-0 return without stores; 1-by-1 and a tightly packed 3-by-2 image work. Build and run checks in both modes.
-
-**Questions:** Why use two pointers for rows and pixels? Why can the XOR mask preserve alpha? What would happen if the inner counter were not reset? Does a stride prove the allocation contains that many rows?
-
-**Completion rubric:** correct nested loop, padding preservation, empty behavior, and reproducible script. Commit: `M02-L03: process strided RGBA images`.
+**Implementation scope:** correct nested loop, padding preservation, empty behavior, and reproducible script. Commit: `M02-L03: process strided RGBA images`.
 
 ## M02-L04 — Own storage in Swift and borrow it safely
 
@@ -223,13 +211,9 @@ Local copies of dimensions avoid reaching back into the same value during a muta
 
 Use this image type in the existing checks. Add a `fillScalar(rgba:)` method using one row at a time and the earlier row kernel. Read the active byte count from validated dimensions; never pass the whole padded byte count as pixels. Keep errors surfaced through `do`/`catch` in the driver, with a clear message and a failing process outcome. The tutor should show a minimal example if this syntax is new.
 
-### After completing the whole lesson
+**Expected behavior in code:** reject negative dimensions, stride smaller than active bytes, overflowing `Int.max` stride times height, and storage above the policy limit without allocating it. Accept a valid padded image and an empty image. Filling/inverting leave padding unchanged.
 
-**Checks:** reject negative dimensions, stride smaller than active bytes, overflowing `Int.max` stride times height, and storage above the policy limit without allocating it. Accept a valid padded image and an empty image. Filling/inverting leave padding unchanged.
-
-**Questions:** Who owns and frees the array storage? Why must the pointer not escape? What does the overflow flag prevent? Why copy dimensions before borrowing the mutable buffer?
-
-**Completion rubric:** checked allocation, scoped pointers, explicit errors, correct empty behavior, and wrapper/kernel responsibilities. Commit: `M02-L04: validate and own image buffers in Swift`.
+**Implementation scope:** checked allocation, scoped pointers, explicit errors, correct empty behavior, and wrapper/kernel responsibilities. Commit: `M02-L04: validate and own image buffers in Swift`.
 
 ## M02-L05 — Read and write your first image files
 
@@ -301,13 +285,9 @@ func writePPM(_ image: Image, to url: URL) throws {
 
 Add a CLI path `pixel invert input.ppm output.ppm` alongside `--self-test`. The tutor supplies the small `CommandLine.arguments` dispatch and `do`/`catch` plumbing if needed. Generate a 2-by-2 fixture with distinct corners through your own writer. Load it, call `invertScalar()`, save it, and retain the original. Record the deliberately limited format support in the project README.
 
-### After completing the whole lesson
+**Expected behavior in code:** opaque RGB write/read is exact; inversion changes only intended RGB; first raster bytes of 10,13,32,35 are preserved as data; truncated/extra payloads and unsupported headers fail; a padded input image writes the correct active pixels. Inspect output visually if a viewer supports the subset, but use byte checks as the authority.
 
-**Checks:** opaque RGB write/read is exact; inversion changes only intended RGB; first raster bytes of 10,13,32,35 are preserved as data; truncated/extra payloads and unsupported headers fail; a padded input image writes the correct active pixels. Inspect output visually if a viewer supports the subset, but use byte checks as the authority.
-
-**Questions:** Why must the parser stop at an exact binary boundary? Why are alpha and padding absent from the file? Why does the payload multiplication follow dimension validation? What format inputs does this reader intentionally reject?
-
-**Completion rubric:** end-to-end file transform, truthful format limits, exact binary parsing, and retained scalar tests. Commit: `M02-L05: transform PPM images end to end`.
+**Implementation scope:** end-to-end file transform, truthful format limits, exact binary parsing, and retained scalar tests. Commit: `M02-L05: transform PPM images end to end`.
 
 ## Module references
 

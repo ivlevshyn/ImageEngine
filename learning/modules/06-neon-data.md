@@ -1,6 +1,6 @@
 # Module 06 — Rearranging and combining vector data
 
-Prerequisite: Module 05. Focus on data layout, intermediate widths, and reductions. Preserve scalar references and arbitrary-length tails. All questions and required checks are at the end of each lesson.
+Prerequisite: Module 05. Focus on data layout, intermediate widths, and reductions. Preserve scalar references and arbitrary-length tails. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M06-L01 — Separate interleaved channels
 
@@ -26,13 +26,9 @@ Create a teaching row-copy kernel using structured loads/stores for full sixteen
 
 Write a table showing the first four pixels before loading and the first four lanes in each register after loading. Use distinct channel values. Avoid using ABI-preserved V8–V15 as unaccounted scratch registers; V0–V7 and V16–V31 are sufficient here.
 
-### After completing the whole lesson
+**Expected behavior in code:** widths 0,1,15,16,17,31,32,33; copied output exact; red/blue swapped exactly; alpha unchanged; source/destination padding untouched; no 64-byte access for fewer than sixteen active pixels.
 
-**Checks:** widths 0,1,15,16,17,31,32,33; copied output exact; red/blue swapped exactly; alpha unchanged; source/destination padding untouched; no 64-byte access for fewer than sixteen active pixels.
-
-**Questions:** How many bytes does this `ld4` read? How does a planar register view differ from planar file storage? Why must the block-count threshold change from four to sixteen pixels? What would forgetting the scalar tail do?
-
-**Completion rubric:** correct deinterleaving model, safe block size, exact permutation, and disjoint destination. Commit: `M06-L01: use structured RGBA loads and stores`.
+**Implementation scope:** correct deinterleaving model, safe block size, exact permutation, and disjoint destination. Commit: `M06-L01: use structured RGBA loads and stores`.
 
 ## M06-L02 — Widen, accumulate, round, and narrow grayscale
 
@@ -62,13 +58,9 @@ rshrn2 v19.16b, v5.8h, #8
 
 Add `grayscale_row_neon(data,pixels)` and its image wrapper. Match M04's formula exactly. Use the scalar formula for the final 0…15 pixels. Annotate each register's lane type at each stage, especially where byte samples become halfword sums.
 
-### After completing the whole lesson
+**Expected behavior in code:** compare all 256 neutral grays, primary-color examples, random colors, high-half-distinct inputs, and all tail lengths. Verify alpha/padding. A test where only pixels 8…15 differ catches forgotten high-half operations.
 
-**Checks:** compare all 256 neutral grays, primary-color examples, random colors, high-half-distinct inputs, and all tail lengths. Verify alpha/padding. A test where only pixels 8…15 differ catches forgotten high-half operations.
-
-**Questions:** Why does widening occur before accumulation? What does the suffix `2` select? Why must rounding happen exactly once? What bound makes 16-bit sums sufficient?
-
-**Completion rubric:** bit-exact scalar match, correct low/high halves, documented ranges, and safe tails. Commit: `M06-L02: vectorize weighted grayscale`.
+**Implementation scope:** bit-exact scalar match, correct low/high halves, documented ranges, and safe tails. Commit: `M06-L02: vectorize weighted grayscale`.
 
 ## M06-L03 — Exact vector blending
 
@@ -95,13 +87,9 @@ Add `blend_row_neon(dst,a,b,pixels,t)` with disjoint destination. Choose a block
 
 For a practical arithmetic proof, create an end-of-lesson parameter test over all t=0…256 and a representative set of channel pairs, including both extremes. Optional exhaustive testing of all channel pairs is useful but not a required runtime cost.
 
-### After completing the whole lesson
+**Expected behavior in code:** t=0,1,127,128,255,256; equal images; alternating high/low channels; all tails; different input strides. Verify no output writes escape the destination and both sources remain unchanged.
 
-**Checks:** t=0,1,127,128,255,256; equal images; alternating high/low channels; all tails; different input strides. Verify no output writes escape the destination and both sources remain unchanged.
-
-**Questions:** Why are halfword weights necessary? Why does `mla` here not need widening? What protects the sum from overflow? Under what condition is blending alpha with the same formula valid?
-
-**Completion rubric:** correct sample widening, 256 endpoint, exact rounding, bounded accesses, and retained opaque contract. Commit: `M06-L03: vectorize exact image blending`.
+**Implementation scope:** correct sample widening, 256 endpoint, exact rounding, bounded accesses, and retained opaque contract. Commit: `M06-L03: vectorize exact image blending`.
 
 ## M06-L04 — Table lookups and channel permutations
 
@@ -138,13 +126,9 @@ The symbol's final address is resolved by the toolchain. Do not embed an absolut
 
 Implement `swap_rb_row_neon` with four-pixel blocks and a scalar tail. Compare its output with M06-L01's structured-load version. Keep both until performance lessons measure them. Explain every index in one pixel group and how the next group's indices shift by four.
 
-### After completing the whole lesson
+**Expected behavior in code:** `[R,G,B,A]` becomes `[B,G,R,A]` for every pixel; two permutations restore the original; all tails and alpha values work. A diagnostic block containing byte values 0…15 must produce the exact index sequence.
 
-**Checks:** `[R,G,B,A]` becomes `[B,G,R,A]` for every pixel; two permutations restore the original; all tails and alpha values work. A diagnostic block containing byte values 0…15 must produce the exact index sequence.
-
-**Questions:** Why is TBL not arbitrary-memory gather? What does an out-of-range index do? Why use relocatable constant addressing? Why can equivalent algorithms perform differently?
-
-**Completion rubric:** correct table, position-independent addressing, exact tail mapping, and comparison with the prior permutation. Commit: `M06-L04: reorder channels with NEON table lookup`.
+**Implementation scope:** correct table, position-independent addressing, exact tail mapping, and comparison with the prior permutation. Commit: `M06-L04: reorder channels with NEON table lookup`.
 
 ## M06-L05 — Reduce pixels into statistics
 
@@ -168,13 +152,9 @@ Declare `uint64_t sum_red_row_neon(const uint8_t *src,uint64_t pixels);` and a s
 
 Add scalar and NEON row sums and a Swift image-statistics wrapper. The vector loop may use `ld4` and discard unused G/B/A lanes, with a scalar tail. Accumulate row sums in UInt64 using checked arithmetic at the public boundary. Convert to Double only when calculating the displayed mean, after the exact integer sum is known. Optional minimum and maximum statistics can use appropriate reductions after this required sum works.
 
-### After completing the whole lesson
+**Expected behavior in code:** all-black sum 0; all-red-255 sum 255*N; sixteen 255 samples sum 4080; known ramp sum; empty mean is absent; padding never contributes. Compare scalar/NEON totals on large synthetic inputs and tails.
 
-**Checks:** all-black sum 0; all-red-255 sum 255*N; sixteen 255 samples sum 4080; known ramp sum; empty mean is absent; padding never contributes. Compare scalar/NEON totals on large synthetic inputs and tails.
-
-**Questions:** Why is `addv b...` inadequate for sixteen bytes? Why use a 64-bit total after a small block reduction? Why defer conversion to floating point? How would multiple independent accumulators affect later optimization?
-
-**Completion rubric:** overflow-aware reduction, exact totals, empty policy, padding exclusion, and independent arithmetic examples. Commit: `M06-L05: reduce image channels into statistics`.
+**Implementation scope:** overflow-aware reduction, exact totals, empty policy, padding exclusion, and independent arithmetic examples. Commit: `M06-L05: reduce image channels into statistics`.
 
 ## Module references
 

@@ -1,6 +1,6 @@
 # Module 07 — Neighborhood filters
 
-Prerequisite: Module 06. Pointwise operations use one input pixel; filters use neighboring pixels too. This changes borders, aliasing, intermediate storage, and tiling. Required filters initially accept **opaque RGBA8** and produce opaque RGBA8 in disjoint storage. Keep all checks/questions at the end.
+Prerequisite: Module 06. Pointwise operations use one input pixel; filters use neighboring pixels too. This changes borders, aliasing, intermediate storage, and tiling. Required filters initially accept **opaque RGBA8** and produce opaque RGBA8 in disjoint storage. Expected behavior describes the implementation and repository tests. Follow the tutor guidance: no final checks/review step, quiz, or evidence submission.
 
 ## M07-L01 — A scalar 3-by-3 box blur
 
@@ -29,13 +29,9 @@ This is pseudocode to translate, not runnable assembly. The first version may pr
 
 Add `box3_rgba_scalar(dst,dstStride,src,srcStride,width,height)` with disjoint output. Supply a Swift reference using the same formula and clear loops. The tutor explains its indexing rather than expecting fluency. Validate opaque input. Demonstrate with a synthetic impulse: one white pixel in a black 5-by-5 image.
 
-### After completing the whole lesson
+**Expected behavior in code:** constant images remain constant; a 1-by-1 image stays unchanged; an interior isolated white pixel gives 28 in each of its nine affected RGB outputs; corner/border results match hand calculation; widths/heights 1 and 2 work; source/padding untouched.
 
-**Checks:** constant images remain constant; a 1-by-1 image stays unchanged; an interior isolated white pixel gives 28 in each of its nine affected RGB outputs; corner/border results match hand calculation; widths/heights 1 and 2 work; source/padding untouched.
-
-**Questions:** Why cannot the first blur safely overwrite its source? Which samples repeat at a corner? Why add 4 before dividing by 9? What is the largest accumulator value?
-
-**Completion rubric:** exact border/rounding semantics, disjoint output, tiny-image handling, and independent reference agreement. Commit: `M07-L01: implement scalar neighborhood blur`.
+**Implementation scope:** exact border/rounding semantics, disjoint output, tiny-image handling, and independent reference agreement. Commit: `M07-L01: implement scalar neighborhood blur`.
 
 ## M07-L02 — Separate horizontal and vertical sums
 
@@ -61,13 +57,9 @@ Add `box3_horizontal_scalar(uint16_t *dst,const uint8_t *src,uint64_t width)` fo
 
 The tutor supplies the orchestration in Swift if needed. Keep the direct 3-by-3 implementation as an oracle. Bound temporary size independently: RGBA16 H takes twice the bytes of RGBA8 input, so the original allocation limit alone is not enough.
 
-### After completing the whole lesson
+**Expected behavior in code:** byte-exact comparison with L01 across tiny, random, impulse, and padded images; temporary sums attain 765 for white; one-pixel-wide images repeat the same sample three times; temporary size validation rejects overflow/excessive allocation.
 
-**Checks:** byte-exact comparison with L01 across tiny, random, impulse, and padded images; temporary sums attain 765 for white; one-pixel-wide images repeat the same sample three times; temporary size validation rejects overflow/excessive allocation.
-
-**Questions:** Why is horizontal division deferred? What units does a UInt16 pointer advance use? How much memory does H require relative to the image? Why can two passes be correct despite traversing in a different order?
-
-**Completion rubric:** unnormalized intermediate, exact scalar equivalence, checked temporary ownership, and explicit element/byte units. Commit: `M07-L02: separate blur passes without extra rounding`.
+**Implementation scope:** unnormalized intermediate, exact scalar equivalence, checked temporary ownership, and explicit element/byte units. Commit: `M07-L02: separate blur passes without extra rounding`.
 
 ## M07-L03 — Vectorize horizontal filtering
 
@@ -94,13 +86,9 @@ Add `box3_horizontal_neon` with the same API as the scalar pass. Handle tiny wid
 
 State the input extent and output extent of one block in comments. Preserve the existing temporary layout. Select the new pass in Swift while leaving the scalar vertical pass unchanged so any mismatch is localized.
 
-### After completing the whole lesson
+**Expected behavior in code:** H values match scalar exactly for widths 1…20 and larger random rows; high-half lanes differ in fixtures; white sums reach 765; all source accesses remain inside the active row; outer markers remain intact. End-to-end blur still matches the direct reference.
 
-**Checks:** H values match scalar exactly for widths 1…20 and larger random rows; high-half lanes differ in fixtures; white sums reach 765; all source accesses remain inside the active row; outer markers remain intact. End-to-end blur still matches the direct reference.
-
-**Questions:** Why is the load bound `x+4 < width`? Why does four RGBA pixels produce 32 output bytes in H? What does `uaddw` widen? Why test intermediate H rather than only the final image?
-
-**Completion rubric:** exact intermediate sums, safe neighbor accesses, tiny-width fallback, and independent pass verification. Commit: `M07-L03: vectorize horizontal blur sums`.
+**Implementation scope:** exact intermediate sums, safe neighbor accesses, tiny-width fallback, and independent pass verification. Commit: `M07-L03: vectorize horizontal blur sums`.
 
 ## M07-L04 — Vectorize vertical filtering and exact division
 
@@ -124,13 +112,9 @@ Widening the product is essential: 2299*7282 does not fit 16 bits. Narrow the qu
 
 Add `box3_vertical_neon` with the same API as the scalar vertical pass. Process full vectors of H elements and finish all remaining pixels safely. Use Swift-selected top/middle/bottom pointers, including replicated rows at the global boundary. Validate the identity independently in Swift for every n in the specified range, and explain why that finite exhaustive check complements the mathematical bound.
 
-### After completing the whole lesson
+**Expected behavior in code:** all 2300 quotient cases pass; vertical output matches scalar for random H values in 0…765; end-to-end blur equals the original direct implementation; one-row images and all tails work; output alpha is 255 for opaque input.
 
-**Checks:** all 2300 quotient cases pass; vertical output matches scalar for random H values in 0…765; end-to-end blur equals the original direct implementation; one-row images and all tails work; output alpha is 255 for opaque input.
-
-**Questions:** Why is the reciprocal valid only with a range argument? Why widen before multiplying? What would normalizing H early change? Which data is reused between neighboring output rows?
-
-**Completion rubric:** exact division with proved/tested domain, correct packing/tails, global borders, and byte-exact complete blur. Commit: `M07-L04: complete exact NEON box blur`.
+**Implementation scope:** exact division with proved/tested domain, correct packing/tails, global borders, and byte-exact complete blur. Commit: `M07-L04: complete exact NEON box blur`.
 
 ## M07-L05 — Sobel edge detection and signed intermediates
 
@@ -148,13 +132,9 @@ Implement a clear scalar Sobel kernel and a Swift reference first. Then add one 
 
 The tutor must provide a worked register-level interior example: zero-extend the unsigned bytes into 16-bit lanes, form the positive sums there, then subtract in those wide lanes and interpret the differences as signed. Do not apply `ssubl` directly to raw image bytes: samples above 127 would be interpreted as negative before widening. The full-image orchestration can be supplied in Swift; learning signed vector arithmetic is the core task.
 
-### After completing the whole lesson
+**Expected behavior in code:** constant images yield zero; a vertical black/white step produces strong vertical-edge output; horizontal and diagonal fixtures distinguish Gx/Gy; scalar/NEON byte equality; tiny dimensions and padding; signed intermediates verified against hand calculations at selected pixels.
 
-**Checks:** constant images yield zero; a vertical black/white step produces strong vertical-edge output; horizontal and diagonal fixtures distinguish Gx/Gy; scalar/NEON byte equality; tiny dimensions and padding; signed intermediates verified against hand calculations at selected pixels.
-
-**Questions:** Why can unsigned subtraction fail here? Why is L1 magnitude an approximation? Why must grayscale remain available while processing neighbors? Why is Int16 sufficient for both gradients and their absolute-value sum?
-
-**Completion rubric:** defined gradients/magnitude, signed-range reasoning, scalar and vector paths, border/tail safety, and interpretable fixtures. Commit: `M07-L05: detect edges with scalar and NEON Sobel`.
+**Implementation scope:** defined gradients/magnitude, signed-range reasoning, scalar and vector paths, border/tail safety, and interpretable fixtures. Commit: `M07-L05: detect edges with scalar and NEON Sobel`.
 
 ## Module references
 
