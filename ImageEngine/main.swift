@@ -98,3 +98,24 @@ let largestRowBytes: UInt64 = rgba_row_bytes(UInt32.max)
 guard largestRowBytes == 17_179_869_180 else {
     fatalError("Wrong row size: got \(largestRowBytes)")
 }
+ var bytes: [UInt8] = [10, 20, 30, 99]
+
+bytes.withUnsafeMutableBufferPointer{ buffer in
+    guard let pointer = buffer.baseAddress else {
+        return
+    }
+
+    invert_pixel(pointer)
+}
+
+print("Inverted pixel: \(bytes)")
+
+bytes.withUnsafeMutableBufferPointer{ buffer in
+    guard let pointer = buffer.baseAddress else {
+        return
+    }
+
+    set_pixel_alpha_opaque(pointer)
+}
+
+print("Opaque pixel: \(bytes)")

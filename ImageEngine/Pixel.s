@@ -78,3 +78,29 @@ _rgba_row_bytes:
     mov w0, w0
     lsl x0, x0, #2
     ret
+
+.p2align 2
+.globl _invert_pixel
+_invert_pixel:
+    mov w2, #255
+
+    ldrb w1, [x0]
+    sub w1, w2, w1
+    strb w1, [x0]
+
+    ldrb w1, [x0, #1]
+    sub w1, w2, w1
+    strb w1, [x0, #1]
+
+    ldrb w1, [x0, #2]
+    sub w1, w2, w1
+    strb w1, [x0, #2]
+
+    ret
+
+.p2align 2
+.globl _set_pixel_alpha_opaque
+_set_pixel_alpha_opaque:
+    mov w1, #255
+    strb w1, [x0, #3]
+    ret

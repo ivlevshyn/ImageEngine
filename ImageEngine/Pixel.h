@@ -26,4 +26,11 @@ uint64_t widen_then_add_one(uint32_t value);
 // Calculates a byte count only; does not allocate or access memory
 uint64_t rgba_row_bytes(uint32_t width);
 
+void invert_pixel(uint8_t *pixel);
+
+// Requires at least four consecutive writable bytes: R, G, B, A.
+// Sets alpha to 255, leaving RGB unchanged.
+// The pointer is used only during the call and is not retained.
+void set_pixel_alpha_opaque(uint8_t *pixel);
+
 #endif
