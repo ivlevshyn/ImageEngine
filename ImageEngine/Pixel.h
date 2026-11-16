@@ -33,4 +33,11 @@ void invert_pixel(uint8_t *pixel);
 // The pointer is used only during the call and is not retained.
 void set_pixel_alpha_opaque(uint8_t *pixel);
 
+
+// Writes rgba to each of pixels consecutive RGBA pixels.
+// For pixels > 0, dst must provide at least 4 * pixels writable bytes.
+// For pixels == 0, performs no memory access; dst may be null.
+// Uses dst only during the call and does not retain it.
+void fill_rgba_scalar(uint8_t *dst, uint64_t pixels, uint32_t rgba);
+
 #endif

@@ -119,3 +119,20 @@ bytes.withUnsafeMutableBufferPointer{ buffer in
 }
 
 print("Opaque pixel: \(bytes)")
+
+runChecks()
+
+let fillColor: UInt32 = pack_rgba(10, 20, 30, 255)
+let fillPixelCount: UInt64 = 30
+
+var filledRow = [UInt8](repeating: 0, count: 120)
+
+filledRow.withUnsafeMutableBufferPointer{ buffer in
+    guard let destination = buffer.baseAddress else {
+        return
+    }
+
+    fill_rgba_scalar(destination, fillPixelCount, fillColor)
+}
+
+print("Filled row: \(filledRow)")

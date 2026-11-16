@@ -104,3 +104,16 @@ _set_pixel_alpha_opaque:
     mov w1, #255
     strb w1, [x0, #3]
     ret
+
+.p2align 2
+.globl _fill_rgba_scalar
+_fill_rgba_scalar:
+    cbz x1, L_fill_done
+
+L_fill_loop:
+    str w2, [x0], #4
+    subs x1, x1, #1
+    b.ne L_fill_loop
+
+L_fill_done:
+    ret
