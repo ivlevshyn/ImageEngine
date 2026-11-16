@@ -4,16 +4,16 @@ This file tracks lesson completion and checked implementation revisions; inspect
 
 ## Current position
 
-- Current lesson: **M02-L02 — Fill a row with a loop** (not started).
+- Current lesson: **M02-L02 — Fill a row with a loop** (Changes requested: self-test argument dispatch).
 - Last completed lesson: **M02-L01 — Read and write through a pointer**.
-- Next lesson: **M02-L02 — Fill a row with a loop**.
-- Current implementation revision: f01291a9ce85281943b4204289dd34322fc956cb
-- Last checked implementation revision: f01291a9ce85281943b4204289dd34322fc956cb (M02-L01 complete at the learner's explicit request under the updated policy).
+- Next lesson: **M02-L03 — Process rows with a stride**, after the M02-L02 self-test argument dispatch fix.
+- Current implementation revision: 438e21ad8f172701ab2215e4a3b71abfd09e81ec
+- Last checked implementation revision: 438e21ad8f172701ab2215e4a3b71abfd09e81ec (M02-L02; native arm64 debug and optimized checks passed; self-test argument dispatch remains to be fixed).
 - Last Ready implementation revision: f01291a9ce85281943b4204289dd34322fc956cb (M02-L01).
 - Toolchain/SDK record: reviewer verified native arm64 execution on macOS 27.2.1 (build 26B131), Apple Swift 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1), Apple Clang 21.0.0 (clang-2100.4.1.1), and the macOS 27.2 SDK on 2026-11-15. Developer directory: /Applications/Xcode.app/Contents/Developer. M02-L01 was built with direct xcrun compiler commands in debug mode.
-- Required work for progression: none. M02-L01 is complete at the learner's explicit request. The earlier invert_pixel declaration-comment finding is retained below as a nonblocking documentation follow-up; no LLDB trace or final answers are required.
-- Current source layout: ImageEngine/Pixel.s, ImageEngine/Pixel.h, and ImageEngine/main.swift, built through ImageEngine.xcodeproj. Earlier review entries retain their historical src/ paths.
-- Revision note: f01291a9ce85281943b4204289dd34322fc956cb is the implementation snapshot from the earlier review. The teaching-policy/completion update changes course documentation only and does not claim a new native execution.
+- Required work for progression: replace the unconditional runChecks() call in ImageEngine/main.swift with an if CommandLine.arguments.contains("--self-test") conditional. The fill kernel and existing checks pass; no final review session, answers, logs, or evidence submissions are required. M02-L01 remains complete; its invert_pixel declaration-comment finding remains a nonblocking documentation follow-up.
+- Current source layout: ImageEngine/Pixel.s, ImageEngine/Pixel.h, ImageEngine/main.swift, and ImageEngine/Checks.swift, built through ImageEngine.xcodeproj. Earlier review entries retain their historical src/ paths.
+- Revision note: 438e21ad8f172701ab2215e4a3b71abfd09e81ec is the checked M02-L02 implementation. On 2026-11-16 its exact committed source was assembled, compiled, and executed on native arm64 with Apple Swift 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1), targeting arm64-apple-macosx27.2.0. Both -Onone and -O runs passed. This progress update changes documentation only.
 
 ## Status definitions
 
@@ -31,7 +31,7 @@ Record the exact implementation commit checked. Commit the progress update after
 | M01-L04 | Ready | fc725ed9bef85083346290ecebe5877ca89544a2 | Complete implementation and diff reviewed; exact committed runner built and executed on native arm64 macOS; 10 supplementary lesson checks passed. All four answers assessed; corrections to Q3 and Q4 explained. | None. Next: M01-L05. |
 | M01-L05 | Ready | 85a0040f242a01d79c9b1a3890da29da2c2586fe | Current source and intervening diff inspected; learner confirmed following the guided LLDB session and everything working as expected. All four answers assessed, with LR naming and final W/X result corrections explained. Unsubmitted trace/note exception recorded below. | None required for progression. Next: M02-L01. |
 | M02-L01 | Ready | f01291a9ce85281943b4204289dd34322fc956cb | Complete at the learner's explicit request on 2026-11-15 under the repository-code policy. Earlier source inspection and native test results remain in history; no new execution claimed. | None required for progression. Optional follow-up: document invert_pixel's four-byte precondition. Next: M02-L02. |
-| M02-L02 | Not started | — | — | — |
+| M02-L02 | Changes requested | 438e21ad8f172701ab2215e4a3b71abfd09e81ec | Full assembly, header, Swift caller, checks, and project configuration inspected; native arm64 debug and optimized runs passed counts 0, 1, 3, marker preservation, and null-pointer zero-count checks. | Gate runChecks() on --self-test in main.swift; it currently runs unconditionally. Next: M02-L03. |
 | M02-L03 | Not started | — | — | — |
 | M02-L04 | Not started | — | — | — |
 | M02-L05 | Not started | — | — | — |
@@ -79,6 +79,20 @@ Record the exact implementation commit checked. Commit the progress update after
 ## Code-check and completion history
 
 For future entries, record the date, lesson, checked implementation commit, files inspected, concrete code findings, status, and next lesson. State whether tests were actually executed when relevant; no learner evidence or question answers are required.
+
+## M02-L02 code check — 2026-11-16
+
+- Checked implementation commit: 438e21ad8f172701ab2215e4a3b71abfd09e81ec.
+- Previous checked implementation commit: f01291a9ce85281943b4204289dd34322fc956cb; intervening documentation and the complete new implementation diff were inspected in the teaching session.
+- Files inspected: ImageEngine/Pixel.s, ImageEngine/Pixel.h, ImageEngine/main.swift, ImageEngine/Checks.swift, ImageEngine.xcodeproj/project.pbxproj, and the shared scheme change.
+- Outcome: **Changes requested** for one command-line integration requirement. All four teaching steps are finished. No fill-kernel, bounds, lifetime, numerical, or ABI defect was found in the checked implementation.
+- Executed checks: exact committed assembly and Swift files were copied to /private/tmp/imageengine-m02-l02-438e21a. Assembly compilation succeeded; Swift builds with -g -Onone and with -O succeeded. Both executables exited successfully with --self-test and printed Fill checks passed. The debug executable was also run without arguments and still ran the checks, confirming the dispatch finding. Existing runner checks passed as well. The Xcode build itself and performance were not tested.
+- Environment observed for this check: native arm64; Apple Swift 6.4.2 (swiftlang-6.4.2.1.9 clang-2100.4.1.1), target arm64-apple-macosx27.2.0. No new OS build or SDK version inspection was performed; the older toolchain/SDK record above retains its original date.
+- Code findings: the initial cbz returns before memory access for count zero; each iteration stores four bytes, advances by four, and decrements the 64-bit pixel counter using subs before b.ne. Only caller-saved registers and flags are changed. The header states the writable-size and zero-count contracts. Swift borrows are synchronous and do not escape. Checks cover counts 0, 1, and 3, expected RGBA bytes, four marker bytes on each side, and nil with count zero. The 30-pixel example provides the correct 120-byte allocation.
+- Required fix: main.swift calls runChecks() unconditionally. Replace that call with a conditional using CommandLine.arguments.contains("--self-test"), as taught, so the flag controls the new checks.
+- No project source was changed by the reviewer. No learner answers, runtime reports, debugger traces, or separate final-review session are required.
+- Next lesson: **M02-L03 — Process rows with a stride**, after the dispatch fix.
+- This documentation commit records the implementation hash checked before the progress update; it does not claim that the outstanding fix is already present.
 
 ## Historical reviews
 
@@ -304,4 +318,4 @@ This update records the review honestly, preserves prior history, and changes on
 
 ## How to resume
 
-Read M02-L02, its prerequisites, the current teaching guidance, and the actual repository source. Use committed code to resolve implementation discrepancies. Do not revive historical final-review, answer, trace, or evidence-submission requirements.
+M02-L02 teaching steps 1–4 are finished. Its implementation at 438e21ad8f172701ab2215e4a3b71abfd09e81ec passes native debug and optimized checks; only the --self-test dispatch fix remains. Inspect any pushed fix at its exact revision, then advance to M02-L03 — Process rows with a stride. Use the current teaching guidance and committed source; do not restart M02-L02 teaching or revive historical final-review, answer, trace, or evidence-submission requirements.
